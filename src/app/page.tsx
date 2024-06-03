@@ -44,6 +44,7 @@ export default function Home() {
                     console.log("authenticated: " + user);
                     // IdP data available using getAdditionalUserInfo(result)
                     // ...
+                    getWorkoutRecentHistory();
                 }).catch((error) => {
                 // Handle Errors here.
                 const errorCode = error.code;
