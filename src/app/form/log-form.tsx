@@ -1,7 +1,14 @@
 import React, {useState} from "react";
-import {log} from "@/app/workout-log-api";
+import {Workout} from "@/app/workout";
+import {noop} from "@/app/noop";
 
-export default function LogForm() {
+interface LogFormProps {
+    onWorkoutLog?: (e: { workout: Workout }) => void;
+}
+
+export default function LogForm(props: LogFormProps) {
+    const {onWorkoutLog = noop} = props;
+
     const [exercise, setExercise] = useState("deadlift");
     const [reps, setReps] = useState(10);
     const [weight, setWeight] = useState(80);
@@ -15,8 +22,15 @@ export default function LogForm() {
         setError(null) // Clear previous errors when a new request starts
 
         try {
-            await log({exercise, reps, weight})
-                .then(res => console.log('saved'));
+            onWorkoutLog({
+                workout: {
+                    exercise,
+                    reps,
+                    weight,
+                    date: Date.now()
+                }
+            });
+
             await new Promise(r => setTimeout(r, 500));
         } catch (error: any) {
             // Capture the error message to display to the user
@@ -25,10 +39,11 @@ export default function LogForm() {
         } finally {
             setIsLoading(false)
         }
-
     };
+
     return (
-        <form className='log-form flex flex-col items-center border-b border-gray-900/10 pb-12 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'>
+        <form
+            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-12 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'>
             {error && <div style={{color: 'red'}}>{error}</div>}
 
             <div className="form-element col-span-full mt-2">

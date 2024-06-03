@@ -10,12 +10,15 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
+    "@types/firebase": "^3.2.1",
+    "firebase": "^10.12.2",
+    "firebaseui": "^6.1.0",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/firebase-client": "^0.1.37",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
