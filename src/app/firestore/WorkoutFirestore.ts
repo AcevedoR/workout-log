@@ -18,7 +18,7 @@ export async function add(workout: Workout, db: Firestore) {
 export async function getMostRecents(lasts: number, db: Firestore): Promise<Workout[]> {
     try {
         const citiesRef = collection(db, WORKOUT_LOG_COLLECTION);
-        let query1 = query(citiesRef, orderBy("date"), limit(lasts));
+        let query1 = query(citiesRef, orderBy("date", "desc"), limit(lasts));
         console.log('Task successfully added');
         const querySnapshot = await getDocs(query1);
         let res: Workout[] = [];
