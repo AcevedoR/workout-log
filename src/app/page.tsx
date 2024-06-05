@@ -41,7 +41,7 @@ export default function Home() {
                     const token = credential?.accessToken;
                     // The signed-in user info.
                     const user = result.user;
-                    console.log("authenticated: " + user);
+                    // console.log("authenticated: " + JSON.stringify(user));
                     // IdP data available using getAdditionalUserInfo(result)
                     // ...
                     getWorkoutRecentHistory();
@@ -57,13 +57,13 @@ export default function Home() {
             console.log(error)
         }
     }
-    console.log("main page user: " + auth1.currentUser?.email);
 
     const onWorkoutLog = async (input: { workout: Workout }) => {
-        await add(input.workout, db);
-        getWorkoutRecentHistory();
+        if (auth1.currentUser) {
+            await add(auth1.currentUser.uid, input.workout, db);
+            getWorkoutRecentHistory();
+        }
     }
-
 
     const [workoutRecentHistory, setWorkoutRecentHistory] = useState([] as Workout[]);
 
@@ -72,8 +72,10 @@ export default function Home() {
     }, []);
 
     const getWorkoutRecentHistory = async () => {
-        const mostRecentWorkouts = await getMostRecents(10, db);
-        setWorkoutRecentHistory(mostRecentWorkouts);
+        if (auth1.currentUser) {
+            const mostRecentWorkouts = await getMostRecents(auth1.currentUser.uid, 10, db);
+            setWorkoutRecentHistory(mostRecentWorkouts);
+        }
     }
 
     return (
