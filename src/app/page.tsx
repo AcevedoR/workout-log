@@ -2,7 +2,7 @@
 
 import LogForm from "@/app/form/log-form";
 import {initializeApp} from 'firebase/app';
-import {Workout} from "@/app/workout";
+import {Workout, WorkoutRow} from "@/app/workout";
 import {getFirestore} from "@firebase/firestore";
 import {GoogleAuthProvider} from "firebase/auth";
 import {
@@ -10,8 +10,8 @@ import {
     signInWithPopup
 } from "firebase/auth";
 import {useEffect, useState} from "react";
-import WorkoutHistory from "@/app/workout-history";
-import {add, getMostRecents} from "@/app/firestore/WorkoutFirestore";
+import WorkoutHistory from "@/app/history/workout-history";
+import {add, deleteOne, getMostRecents} from "@/app/firestore/WorkoutFirestore";
 
 export default function Home() {
     const firebaseConfig = {
@@ -65,10 +65,17 @@ export default function Home() {
         }
     }
 
-    const [workoutRecentHistory, setWorkoutRecentHistory] = useState([] as Workout[]);
+    const onWorkoutDelete = async (workoutId: string) => {
+        if (auth1.currentUser) {
+            await deleteOne(workoutId, db);
+            getWorkoutRecentHistory();
+        }
+    }
+
+    const [workoutRecentHistory, setWorkoutRecentHistory] = useState([] as WorkoutRow[]);
 
     useEffect(() => {
-        getWorkoutRecentHistory();
+        getWorkoutRecentHistory;
     }, []);
 
     const getWorkoutRecentHistory = async () => {
@@ -88,7 +95,8 @@ export default function Home() {
                 <h1 className={"text-4xl text-center"}>Workout log</h1>
                 <LogForm onWorkoutLog={onWorkoutLog}>
                 </LogForm>
-                <WorkoutHistory workoutList={workoutRecentHistory}></WorkoutHistory>
+                <WorkoutHistory workoutList={workoutRecentHistory}
+                                onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutHistory>
             </div>
         </main>
     );

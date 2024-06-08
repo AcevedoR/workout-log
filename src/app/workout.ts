@@ -4,3 +4,8 @@ export interface Workout {
     weight: number,
     date: number,
 }
+
+export interface WorkoutRow {
+    id: string,
+    value: Workout
+}

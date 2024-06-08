@@ -1,5 +1,16 @@
-import {addDoc, collection, Firestore, getDocs, limit, orderBy, query, where} from "@firebase/firestore";
-import {Workout} from "@/app/workout";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    Firestore,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    where
+} from "@firebase/firestore";
+import {Workout, WorkoutRow} from "@/app/workout";
 
 const WORKOUT_LOG_COLLECTION = "workout-log";
 
@@ -21,7 +32,18 @@ export async function add(userId: string, workout: Workout, db: Firestore) {
     }
 }
 
-export async function getMostRecents(userId: string, lasts: number, db: Firestore): Promise<Workout[]> {
+export async function deleteOne(workoutId: string, db: Firestore) {
+    try {
+        await deleteDoc(
+            doc(db, WORKOUT_LOG_COLLECTION, workoutId)
+        );
+    } catch
+        (e: any) {
+        console.log('Unsuccessful' + e)
+    }
+}
+
+export async function getMostRecents(userId: string, lasts: number, db: Firestore): Promise<WorkoutRow[]> {
     try {
         const workoutLogCollection = collection(db, WORKOUT_LOG_COLLECTION);
         let query1 = query(workoutLogCollection,
@@ -30,11 +52,11 @@ export async function getMostRecents(userId: string, lasts: number, db: Firestor
         );
 
         const querySnapshot = await getDocs(query1);
-        let res: Workout[] = [];
+        let res: WorkoutRow[] = [];
         querySnapshot.forEach((doc) => {
             // doc.data() is never undefined for query doc snapshots
             // console.log(doc.id, " => ", doc.data());
-            res.push(doc.data() as Workout)
+            res.push({id: doc.id, value: doc.data() as Workout})
         });
         return res;
     } catch
