@@ -87,10 +87,6 @@ export default function Home() {
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24 ">
-
-            <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
-            <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css"/>
-
             <div>
                 <h1 className={"text-4xl text-center"}>Workout log</h1>
                 <LogForm onWorkoutLog={onWorkoutLog}>
