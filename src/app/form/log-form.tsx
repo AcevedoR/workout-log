@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, FocusEvent} from "react";
 import {Workout} from "@/app/workout";
 import {noop} from "@/app/noop";
 
@@ -42,6 +42,8 @@ export default function LogForm(props: LogFormProps) {
         }
     };
 
+    const selectAllInputOnFocus = (e: FocusEvent<HTMLInputElement>):void => e.target.select();
+
     return (
         <form
             className='log-form flex flex-col items-center border-b border-gray-900/10 pb-12 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'>
@@ -57,6 +59,7 @@ export default function LogForm(props: LogFormProps) {
                     onChange={(e) =>
                         setExercise(e.target.value)
                     }
+                    onFocus={selectAllInputOnFocus}
                     required
                 />
             </div>
@@ -70,6 +73,7 @@ export default function LogForm(props: LogFormProps) {
                     onChange={(e) =>
                         setReps(Number.parseInt(e.target.value))
                     }
+                    onFocus={selectAllInputOnFocus}
                     required
                 />
             </div>
@@ -83,6 +87,7 @@ export default function LogForm(props: LogFormProps) {
                     onChange={(e) =>
                         setWeight(Number.parseInt(e.target.value))
                     }
+                    onFocus={selectAllInputOnFocus}
                     required
                 />
             </div>
