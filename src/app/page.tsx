@@ -13,6 +13,7 @@ import {useEffect, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
 import {add, deleteOne, getMostRecents} from "@/app/firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
+import InfoTooltip from "@/app/utils/info-tooltip";
 
 export default function Home() {
     const firebaseConfig = {
@@ -88,9 +89,16 @@ export default function Home() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24 ">
+        <main className="flex min-h-screen flex-col items-center justify-between p-24">
             <div>
-                <h1 className={"text-4xl text-center"}>Workout log</h1>
+                <div className="text-4xl text-center inline-flex">
+                    <h1>
+                        Workout log
+                    </h1>
+                    <InfoTooltip
+                        textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
+                </div>
+                <p>A simple app to help you log your workout sessions</p>
                 <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                 </LogForm>
                 <WorkoutHistory workoutList={workoutRecentHistory}
