@@ -55,6 +55,7 @@ export default function LogForm(props: LogFormProps) {
                     type="text"
                     name="exercise"
                     id="exercise"
+                    list="defaultExercices"
                     value={exercise}
                     onChange={(e) =>
                         setExercise(e.target.value)
@@ -62,6 +63,12 @@ export default function LogForm(props: LogFormProps) {
                     onFocus={selectAllInputOnFocus}
                     required
                 />
+                <datalist id="defaultExercices">
+                    <option value="deadlift"></option>
+                    <option value="squat"></option>
+                    <option value="bench press"></option>
+                    <option value="biceps curl"></option>
+                </datalist>
             </div>
             <div className={"form-element"}>
                 <label className="block text-sm font-medium leading-6" htmlFor="reps">Reps</label>
