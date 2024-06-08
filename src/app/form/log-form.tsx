@@ -4,14 +4,15 @@ import {noop} from "@/app/noop";
 
 interface LogFormProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
+    lastWorkoutInput: Workout | undefined;
 }
 
 export default function LogForm(props: LogFormProps) {
-    const {onWorkoutLog = noop} = props;
+    const {onWorkoutLog = noop, lastWorkoutInput    } = props;
 
-    const [exercise, setExercise] = useState("deadlift");
-    const [reps, setReps] = useState(10);
-    const [weight, setWeight] = useState(80);
+    const [exercise, setExercise] = useState(lastWorkoutInput ? lastWorkoutInput.exercise : "deadlift");
+    const [reps, setReps] = useState(lastWorkoutInput ? lastWorkoutInput.reps : 10);
+    const [weight, setWeight] = useState(lastWorkoutInput ? lastWorkoutInput.weight : 80);
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)

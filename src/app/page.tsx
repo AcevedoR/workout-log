@@ -12,6 +12,7 @@ import {
 import {useEffect, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
 import {add, deleteOne, getMostRecents} from "@/app/firestore/WorkoutFirestore";
+import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 
 export default function Home() {
     const firebaseConfig = {
@@ -61,6 +62,7 @@ export default function Home() {
     const onWorkoutLog = async (input: { workout: Workout }) => {
         if (auth1.currentUser) {
             await add(auth1.currentUser.uid, input.workout, db);
+            saveLastWorkoutInputInLocalStorage(input.workout);
             getWorkoutRecentHistory();
         }
     }
@@ -89,7 +91,7 @@ export default function Home() {
         <main className="flex min-h-screen flex-col items-center justify-between p-24 ">
             <div>
                 <h1 className={"text-4xl text-center"}>Workout log</h1>
-                <LogForm onWorkoutLog={onWorkoutLog}>
+                <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                 </LogForm>
                 <WorkoutHistory workoutList={workoutRecentHistory}
                                 onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutHistory>
