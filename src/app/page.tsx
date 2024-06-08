@@ -7,7 +7,10 @@ import {getFirestore} from "@firebase/firestore";
 import {GoogleAuthProvider} from "firebase/auth";
 import {
     getAuth,
-    signInWithPopup
+    signInWithRedirect,
+    getRedirectResult,
+    User,
+    UserCredential
 } from "firebase/auth";
 import {useEffect, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
@@ -25,48 +28,56 @@ export default function Home() {
     const firebase = initializeApp(firebaseConfig);
     let auth1 = getAuth(firebase);
     const db = getFirestore(firebase);
+    let currentUser: User | null = auth1.currentUser;
+    let redirectResult: UserCredential | null = null;
 
-    const [aaa, setAaa] = useState(false);
+    auth1.onAuthStateChanged(user => currentUser = user);
 
-    if (!aaa && !auth1.currentUser) {
-        const provider = new GoogleAuthProvider();
-        console.log("logging in");
-        setAaa(true);
 
-        try {
-            signInWithPopup(auth1, provider)
-                .then((result) => {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    const credential = GoogleAuthProvider.credentialFromResult(result);
-                    const token = credential?.accessToken;
-                    // The signed-in user info.
-                    const user = result.user;
-                    // console.log("authenticated: " + JSON.stringify(user));
-                    // IdP data available using getAdditionalUserInfo(result)
-                    // ...
-                    getWorkoutRecentHistory();
-                }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const credential = GoogleAuthProvider.credentialFromError(error);
-                console.log("error: " + errorCode);
-                console.log("credential linked to error: " + credential);
-            });
-        } catch (error: any) {
-            console.log("ffs an error occurred")
-            console.log(error)
-        }
-    }
+    getRedirectResult(auth1)
+        .then((result) => {
+            if (result) {
+                redirectResult = result;
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential?.accessToken;
+                // The signed-in currentUser info.
+                const user = result.user;
+                // console.log("authenticated: " + JSON.stringify(currentUser));
+                // IdP data available using getAdditionalUserInfo(result)
+                // ...
+                getWorkoutRecentHistory();
+            } else {
+                console.log("currentUser not authenticated after redirection");
+                if (!redirectResult && !currentUser) {
+                    const provider = new GoogleAuthProvider();
+                    console.log("logging in");
+
+                    try {
+                        signInWithRedirect(auth1, provider);
+                    } catch (error: any) {
+                        console.log("ffs an error occurred")
+                        console.log(error)
+                    }
+                }
+            }
+        }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log("error: " + errorCode);
+        console.log("credential linked to error: " + credential);
+    });
 
     const onWorkoutLog = async (input: { workout: Workout }) => {
-        if (auth1.currentUser) {
-            await add(auth1.currentUser.uid, input.workout, db);
+        if (currentUser) {
+            await add(currentUser.uid, input.workout, db);
             getWorkoutRecentHistory();
         }
     }
 
     const onWorkoutDelete = async (workoutId: string) => {
-        if (auth1.currentUser) {
+        if (currentUser) {
             await deleteOne(workoutId, db);
             getWorkoutRecentHistory();
         }
@@ -79,18 +90,14 @@ export default function Home() {
     }, []);
 
     const getWorkoutRecentHistory = async () => {
-        if (auth1.currentUser) {
-            const mostRecentWorkouts = await getMostRecents(auth1.currentUser.uid, 10, db);
+        if (currentUser) {
+            const mostRecentWorkouts = await getMostRecents(currentUser.uid, 10, db);
             setWorkoutRecentHistory(mostRecentWorkouts);
         }
     }
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24 ">
-
-            <script src="bower_components/firebaseui/dist/firebaseui.js"></script>
-            <link type="text/css" rel="stylesheet" href="bower_components/firebaseui/dist/firebaseui.css"/>
-
             <div>
                 <h1 className={"text-4xl text-center"}>Workout log</h1>
                 <LogForm onWorkoutLog={onWorkoutLog}>
