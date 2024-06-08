@@ -8,7 +8,7 @@ interface LogFormProps {
 }
 
 export default function LogForm(props: LogFormProps) {
-    const {onWorkoutLog = noop, lastWorkoutInput    } = props;
+    const {onWorkoutLog = noop, lastWorkoutInput} = props;
 
     const [exercise, setExercise] = useState(lastWorkoutInput ? lastWorkoutInput.exercise : "deadlift");
     const [reps, setReps] = useState(lastWorkoutInput ? lastWorkoutInput.reps : 10);
@@ -19,6 +19,7 @@ export default function LogForm(props: LogFormProps) {
 
     const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
+        lastFocusEvent?.target.blur();
         setIsLoading(true)
         setError(null) // Clear previous errors when a new request starts
 
@@ -42,7 +43,12 @@ export default function LogForm(props: LogFormProps) {
         }
     };
 
-    const selectAllInputOnFocus = (e: FocusEvent<HTMLInputElement>):void => e.target.select();
+    const selectAllInputOnFocus = (e: FocusEvent<HTMLInputElement>): void => {
+        lastFocusEvent = e;
+        e.target.select();
+    }
+
+    let lastFocusEvent: FocusEvent<HTMLInputElement> | undefined = undefined;
 
     return (
         <form
