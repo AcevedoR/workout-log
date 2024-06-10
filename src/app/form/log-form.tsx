@@ -17,7 +17,7 @@ export default function LogForm(props: LogFormProps) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
 
-    const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         lastFocusEvent?.target.blur();
         setIsLoading(true)
@@ -52,7 +52,9 @@ export default function LogForm(props: LogFormProps) {
 
     return (
         <form
-            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-12 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'>
+            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'
+            onSubmit={(e) => onSubmit(e)}
+        >
             {error && <div style={{color: 'red'}}>{error}</div>}
 
             <div className="form-element col-span-full mt-2">
@@ -109,9 +111,7 @@ export default function LogForm(props: LogFormProps) {
                     className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     type="submit"
                     value="Submit"
-                    disabled={isLoading}
-                    onClick={(e) => onSubmit(e)}
-                >
+                    disabled={isLoading}>
                     {isLoading ? 'Loading...' : 'Submit'}
                 </button>
             </div>
