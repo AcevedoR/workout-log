@@ -20,6 +20,14 @@ export default function LogForm(props: LogFormProps) {
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         lastFocusEvent?.target.blur();
+        if(document && document.activeElement){
+            try{
+                const activeElement = document.activeElement as HTMLElement;
+                activeElement.blur();
+            } catch(e){
+                console.error("could not blur activeElement because: " + e);
+            }
+        }
         setIsLoading(true)
         setError(null) // Clear previous errors when a new request starts
 
@@ -52,7 +60,7 @@ export default function LogForm(props: LogFormProps) {
 
     return (
         <form
-            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-10 gap-x-6 gap-y-8 sm:grid-cols-6'
+            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-4 gap-x-6 gap-y-8 sm:grid-cols-6'
             onSubmit={(e) => onSubmit(e)}
         >
             {error && <div style={{color: 'red'}}>{error}</div>}
