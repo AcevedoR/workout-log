@@ -4,16 +4,13 @@ import LogForm from "@/app/form/log-form";
 import {initializeApp} from 'firebase/app';
 import {Workout, WorkoutRow} from "@/app/workout";
 import {getFirestore} from "@firebase/firestore";
-import {GoogleAuthProvider} from "firebase/auth";
-import {
-    getAuth,
-    signInWithPopup
-} from "firebase/auth";
+import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {useEffect, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
-import {add, deleteOne, getMostRecents} from "@/app/firestore/WorkoutFirestore";
+import {add, deleteOne, findBestPerformance, getMostRecents} from "@/app/firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 import InfoTooltip from "@/app/utils/info-tooltip";
+import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performance";
 
 export default function Home() {
     const firebaseConfig = {
@@ -28,12 +25,10 @@ export default function Home() {
     let auth1 = getAuth(firebase);
     const db = getFirestore(firebase);
 
-    const [aaa, setAaa] = useState(false);
 
-    if (!aaa && !auth1.currentUser) {
+    if (!auth1.currentUser) {
         const provider = new GoogleAuthProvider();
         console.log("logging in");
-        setAaa(true);
 
         try {
             signInWithPopup(auth1, provider)
@@ -88,6 +83,23 @@ export default function Home() {
         }
     }
 
+    const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow|undefined>(undefined);
+    const findBestWorkoutPerformance = async (exercice: string) => {
+        if (auth1.currentUser) {
+            setBestWorkoutPerformance(await findBestPerformance(auth1.currentUser.uid, exercice, db));
+        }
+    }
+
+    const bestWorkoutPerformanceWidget = <div
+        className="ml-20 log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-4 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <BestWorkoutPerformance personalBestWorkout={{
+            exercise: 'deadlift',
+            weight: 120,
+            reps: 1,
+            date: Date.now()
+        }}></BestWorkoutPerformance>
+    </div>;
+
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-24">
             <div>
@@ -99,8 +111,12 @@ export default function Home() {
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                 </div>
                 <p>A simple app to help you log your workout sessions</p>
-                <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
-                </LogForm>
+                <div className="flex flex-row">
+                    <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
+                    </LogForm>
+                    {/*feature disabled for now*/}
+                    {false ? bestWorkoutPerformanceWidget : <div></div>}
+                </div>
                 <WorkoutHistory workoutList={workoutRecentHistory}
                                 onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutHistory>
             </div>
