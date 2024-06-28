@@ -60,7 +60,7 @@ export default function LogForm(props: LogFormProps) {
 
     return (
         <form
-            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-4 gap-x-6 gap-y-8 sm:grid-cols-6'
+            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-2 gap-x-6 gap-y-8 sm:grid-cols-6'
             onSubmit={(e) => onSubmit(e)}
         >
             {error && <div style={{color: 'red'}}>{error}</div>}

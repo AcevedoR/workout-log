@@ -1,6 +1,7 @@
 import React from "react";
 import {Workout} from "@/app/workout";
 import {noop} from "@/app/noop";
+import {formatDate} from "@/app/utils";
 
 interface BestWorkoutPerformanceProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
@@ -24,7 +25,7 @@ export default function BestWorkoutPerformance(props: BestWorkoutPerformanceProp
                     {personalBestWorkout.weight}
                     <p className="text-gray-500 text-sm">kg</p>
                 </div>
-                <div>{new Date(personalBestWorkout.date).toISOString().split('T')[0]} </div>
+                <div>{formatDate(personalBestWorkout.date)} </div>
             </div>
         </div>
     );

@@ -101,9 +101,9 @@ export default function Home() {
     </div>;
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <main className="flex min-h-screen flex-col items-center justify-between p-10 pt-6">
             <div>
-                <div className="text-4xl text-center inline-flex">
+                <div className="text-4xl flex justify-center">
                     <h1>
                         Workout log
                     </h1>
@@ -111,7 +111,7 @@ export default function Home() {
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                 </div>
                 <p>A simple app to help you log your workout sessions</p>
-                <div className="flex flex-row">
+                <div>
                     <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                     </LogForm>
                     {/*feature disabled for now*/}
