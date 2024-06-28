@@ -66,7 +66,3 @@ export async function getMostRecents(userId: string, lasts: number, db: Firestor
     return [];
 }
 
-export async function findBestPerformance(userId: string, exercise: string, db: Firestore): Promise<WorkoutRow | undefined> {
-
-    return {};
-}
