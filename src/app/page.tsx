@@ -7,7 +7,7 @@ import {getFirestore} from "@firebase/firestore";
 import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {useEffect, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
-import {add, deleteOne, findBestPerformance, getMostRecents} from "@/app/firestore/WorkoutFirestore";
+import {add, deleteOne, getMostRecents} from "@/app/firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 import InfoTooltip from "@/app/utils/info-tooltip";
 import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performance";
@@ -86,7 +86,7 @@ export default function Home() {
     const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow|undefined>(undefined);
     const findBestWorkoutPerformance = async (exercice: string) => {
         if (auth1.currentUser) {
-            setBestWorkoutPerformance(await findBestPerformance(auth1.currentUser.uid, exercice, db));
+            // setBestWorkoutPerformance(await findBestPerformance(auth1.currentUser.uid, exercice, db)); TODO
         }
     }
 
