@@ -66,3 +66,32 @@ export async function getMostRecents(userId: string, lasts: number, db: Firestor
     return [];
 }
 
+export async function findPersonalBest(userId: string, exercise: string, db: Firestore): Promise<WorkoutRow | undefined> {
+    try {
+        const workoutLogCollection = collection(db, WORKOUT_LOG_COLLECTION);
+
+        console.info("findPersonalBest: " + exercise)
+        const querySnapshot = await getDocs(
+            query(workoutLogCollection,
+                where("userId", "==", userId),
+                where("exercise", "==", exercise),
+                orderBy("weight", "desc"),
+                orderBy("reps", "desc"),
+                limit(1)
+            )
+        );
+
+        let found = undefined;
+        querySnapshot.forEach((doc) => {
+            console.info("found: " + JSON.stringify({id: doc.id, value: doc.data() as Workout}))
+            found = {id: doc.id, value: doc.data() as Workout};
+            return
+        });
+        return found;
+    } catch
+        (e: any) {
+        console.log('Unsuccessful' + e)
+    }
+    return undefined;
+}
+

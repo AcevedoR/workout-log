@@ -7,7 +7,7 @@ import {getFirestore} from "@firebase/firestore";
 import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 import {useEffect, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
-import {add, deleteOne, getMostRecents} from "@/app/firestore/WorkoutFirestore";
+import {add, deleteOne, findPersonalBest, getMostRecents} from "@/app/firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 import InfoTooltip from "@/app/utils/info-tooltip";
 import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performance";
@@ -60,7 +60,12 @@ export default function Home() {
             await add(auth1.currentUser.uid, input.workout, db);
             saveLastWorkoutInputInLocalStorage(input.workout);
             getWorkoutRecentHistory();
+            findBestWorkoutPerformance(input.workout.exercise);
         }
+    }
+
+    const onExerciseSelected = (e:{exercise: string}) => {
+        findBestWorkoutPerformance(e.exercise);
     }
 
     const onWorkoutDelete = async (workoutId: string) => {
@@ -86,20 +91,15 @@ export default function Home() {
     const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow | undefined>(undefined);
     const findBestWorkoutPerformance = async (exercice: string) => {
         if (auth1.currentUser) {
-            // setBestWorkoutPerformance(await findBestPerformance(auth1.currentUser.uid, exercice, db)); TODO
+            setBestWorkoutPerformance(await findPersonalBest(auth1.currentUser.uid, exercice, db));
         }
     }
 
     const subtitle = <p>A simple app to help you log your workout sessions</p>
 
-    const bestWorkoutPerformanceWidget = <div
+    const bestWorkoutPerformanceWidget = (bestWorkoutPerformance: Workout) => <div
         className="flex flex-col items-center mt-4">
-        <BestWorkoutPerformance personalBestWorkout={{
-            exercise: 'deadlift',
-            weight: 120,
-            reps: 1,
-            date: Date.now()
-        }}></BestWorkoutPerformance>
+        <BestWorkoutPerformance personalBestWorkout={bestWorkoutPerformance}></BestWorkoutPerformance>
     </div>;
 
     return (
@@ -112,9 +112,9 @@ export default function Home() {
                     <InfoTooltip
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                 </div>
-                {false ? bestWorkoutPerformanceWidget : subtitle}
+                {bestWorkoutPerformance ? bestWorkoutPerformanceWidget(bestWorkoutPerformance.value) : subtitle}
                 <div>
-                    <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
+                    <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                     </LogForm>
                 </div>
                 <WorkoutHistory workoutList={workoutRecentHistory}

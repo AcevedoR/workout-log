@@ -1,14 +1,15 @@
-import React, {useState, FocusEvent} from "react";
+import React, {FocusEvent, useState} from "react";
 import {Workout} from "@/app/workout";
 import {noop} from "@/app/noop";
 
 interface LogFormProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
+    onExerciseSelected?: (e: { exercise: string }) => void;
     lastWorkoutInput: Workout | undefined;
 }
 
 export default function LogForm(props: LogFormProps) {
-    const {onWorkoutLog = noop, lastWorkoutInput} = props;
+    const {onWorkoutLog = noop, onExerciseSelected = noop, lastWorkoutInput} = props;
 
     const [exercise, setExercise] = useState(lastWorkoutInput ? lastWorkoutInput.exercise : "deadlift");
     const [reps, setReps] = useState(lastWorkoutInput ? lastWorkoutInput.reps : 10);
@@ -17,14 +18,21 @@ export default function LogForm(props: LogFormProps) {
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
 
+    const onExerciseChange = (exercise: string) => {
+        setExercise(exercise);
+        if(exercise.length > 2){
+            onExerciseSelected({exercise});
+        }
+    }
+
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         lastFocusEvent?.target.blur();
-        if(document && document.activeElement){
-            try{
+        if (document && document.activeElement) {
+            try {
                 const activeElement = document.activeElement as HTMLElement;
                 activeElement.blur();
-            } catch(e){
+            } catch (e) {
                 console.error("could not blur activeElement because: " + e);
             }
         }
@@ -41,7 +49,7 @@ export default function LogForm(props: LogFormProps) {
                 }
             });
 
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 200));
         } catch (error: any) {
             // Capture the error message to display to the user
             setError(error.message)
@@ -74,7 +82,7 @@ export default function LogForm(props: LogFormProps) {
                     list="defaultExercices"
                     value={exercise}
                     onChange={(e) =>
-                        setExercise(e.target.value)
+                        onExerciseChange(e.target.value)
                     }
                     onFocus={selectAllInputOnFocus}
                     required
