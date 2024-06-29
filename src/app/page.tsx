@@ -83,15 +83,17 @@ export default function Home() {
         }
     }
 
-    const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow|undefined>(undefined);
+    const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow | undefined>(undefined);
     const findBestWorkoutPerformance = async (exercice: string) => {
         if (auth1.currentUser) {
             // setBestWorkoutPerformance(await findBestPerformance(auth1.currentUser.uid, exercice, db)); TODO
         }
     }
 
+    const subtitle = <p>A simple app to help you log your workout sessions</p>
+
     const bestWorkoutPerformanceWidget = <div
-        className="ml-20 log-form flex flex-col items-center border-b border-gray-900/10 pb-6 mt-4 gap-x-6 gap-y-8 sm:grid-cols-6">
+        className="flex flex-col items-center mt-4">
         <BestWorkoutPerformance personalBestWorkout={{
             exercise: 'deadlift',
             weight: 120,
@@ -110,12 +112,10 @@ export default function Home() {
                     <InfoTooltip
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                 </div>
-                <p>A simple app to help you log your workout sessions</p>
+                {false ? bestWorkoutPerformanceWidget : subtitle}
                 <div>
                     <LogForm onWorkoutLog={onWorkoutLog} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                     </LogForm>
-                    {/*feature disabled for now*/}
-                    {false ? bestWorkoutPerformanceWidget : <div></div>}
                 </div>
                 <WorkoutHistory workoutList={workoutRecentHistory}
                                 onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutHistory>

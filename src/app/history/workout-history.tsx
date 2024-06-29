@@ -25,7 +25,7 @@ export default function WorkoutHistory(props: WorkoutHistoryProps) {
                         <li key={workout.id} className="py-3 sm:py-4">
                             <div className="flex flex-row space-x-4 justify-between">
 
-                                <div>
+                                <div className="text-gray-500">
                                     {formatDateNarrow(workout.value.date)}
                                 </div>
                                 <div className="inline-flex min-w-0">
