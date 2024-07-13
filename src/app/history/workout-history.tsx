@@ -2,7 +2,7 @@ import React from "react";
 import {WorkoutRow} from "@/app/workout";
 import {noop} from "@/app/noop";
 import {RemoveWorkoutButton} from "@/app/history/remove-workout-button";
-import {formatDateNarrow} from "@/app/utils";
+import {formatDateNarrow} from "@/app/utils/date-utils";
 
 interface WorkoutHistoryProps {
     workoutList: WorkoutRow[],

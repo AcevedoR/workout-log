@@ -1,7 +1,7 @@
 import React from "react";
 import {Workout} from "@/app/workout";
 import {noop} from "@/app/noop";
-import {formatDateNarrow} from "@/app/utils";
+import {formatDateNarrow} from "@/app/utils/date-utils";
 
 interface BestWorkoutPerformanceProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
