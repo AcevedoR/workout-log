@@ -1,7 +1,7 @@
 import React from "react";
 import {Workout} from "@/app/workout";
 import {noop} from "@/app/noop";
-import {formatDateNarrow} from "@/app/utils/date-utils";
+import {formatNarrowSmartly} from "@/app/utils/date-utils";
 
 interface BestWorkoutPerformanceProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
@@ -27,7 +27,7 @@ export default function BestWorkoutPerformance(props: BestWorkoutPerformanceProp
                         <p className="text-gray-500 text-sm">kg</p>
                     </div>
                 </div>
-                <div className="text-gray-500">{formatDateNarrow(personalBestWorkout.date)} </div>
+                <div className="text-gray-500">{formatNarrowSmartly(personalBestWorkout.date)} </div>
             </div>
         </div>
     );

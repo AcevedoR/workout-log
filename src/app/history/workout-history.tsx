@@ -2,7 +2,7 @@ import React from "react";
 import {WorkoutRow} from "@/app/workout";
 import {noop} from "@/app/noop";
 import {RemoveWorkoutButton} from "@/app/history/remove-workout-button";
-import {formatDateNarrow} from "@/app/utils/date-utils";
+import {formatNarrowSmartly} from "@/app/utils/date-utils";
 
 interface WorkoutHistoryProps {
     workoutList: WorkoutRow[],
@@ -26,7 +26,7 @@ export default function WorkoutHistory(props: WorkoutHistoryProps) {
                             <div className="flex flex-row space-x-4 justify-between">
 
                                 <div className="text-gray-500">
-                                    {formatDateNarrow(workout.value.date)}
+                                    {formatNarrowSmartly(workout.value.date)}
                                 </div>
                                 <div className="inline-flex min-w-0">
                                     {workout.value.exercise}
