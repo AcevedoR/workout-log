@@ -5,12 +5,13 @@ import {initializeApp} from 'firebase/app';
 import {Workout, WorkoutRow} from "@/app/workout";
 import {getFirestore} from "@firebase/firestore";
 import {getAuth, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import WorkoutHistory from "@/app/history/workout-history";
 import {add, deleteOne, findPersonalBest, getMostRecents} from "@/app/firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 import InfoTooltip from "@/app/utils/info-tooltip";
 import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performance";
+import {ClockWatch} from "@/app/clock-watch";
 
 export default function Home() {
     const firebaseConfig = {
@@ -61,10 +62,11 @@ export default function Home() {
             saveLastWorkoutInputInLocalStorage(input.workout);
             getWorkoutRecentHistory();
             findBestWorkoutPerformance(input.workout.exercise);
+            resetClockWatch();
         }
     }
 
-    const onExerciseSelected = (e:{exercise: string}) => {
+    const onExerciseSelected = (e: { exercise: string }) => {
         findBestWorkoutPerformance(e.exercise);
     }
 
@@ -74,6 +76,11 @@ export default function Home() {
             getWorkoutRecentHistory();
         }
     }
+
+    const clockWatchChildRef = useRef()
+    const resetClockWatch = (): void => {
+        clockWatchChildRef?.current?.resetClockWatch();
+    };
 
     const [workoutRecentHistory, setWorkoutRecentHistory] = useState([] as WorkoutRow[]);
 
@@ -113,8 +120,10 @@ export default function Home() {
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                 </div>
                 {bestWorkoutPerformance ? bestWorkoutPerformanceWidget(bestWorkoutPerformance.value) : subtitle}
+                <ClockWatch ref={clockWatchChildRef}></ClockWatch>
                 <div>
-                    <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected} lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
+                    <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
+                             lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                     </LogForm>
                 </div>
                 <WorkoutHistory workoutList={workoutRecentHistory}
