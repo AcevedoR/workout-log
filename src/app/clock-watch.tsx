@@ -1,7 +1,11 @@
 'use client'
-import React, {forwardRef, useEffect, useImperativeHandle, useState} from "react";
+import React, {forwardRef, Ref, useEffect, useImperativeHandle, useState} from "react";
 
-export const ClockWatch = forwardRef((props, ref) => {
+export interface ClockWatchRef {
+    resetClockWatch: () => void
+}
+
+export const ClockWatch = forwardRef((props, ref: Ref<ClockWatchRef>) => {
     const [timeToDisplay, setTimeToDisplay] = useState("");
     const [date, setDate] = useState(new Date("1968-11-16T00:00:00"));
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
@@ -15,7 +19,7 @@ export const ClockWatch = forwardRef((props, ref) => {
     };
 
     useImperativeHandle(ref, () => ({
-        resetClockWatch: () => resetClockWatch(),
+        resetClockWatch,
     }));
 
 

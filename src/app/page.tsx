@@ -11,7 +11,7 @@ import {add, deleteOne, findPersonalBest, getMostRecents} from "@/app/firestore/
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 import InfoTooltip from "@/app/utils/info-tooltip";
 import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performance";
-import {ClockWatch} from "@/app/clock-watch";
+import {ClockWatch, ClockWatchRef} from "@/app/clock-watch";
 
 export default function Home() {
     const firebaseConfig = {
@@ -77,7 +77,7 @@ export default function Home() {
         }
     }
 
-    const clockWatchChildRef = useRef()
+    const clockWatchChildRef = useRef<ClockWatchRef>(null)
     const resetClockWatch = (): void => {
         clockWatchChildRef?.current?.resetClockWatch();
     };
