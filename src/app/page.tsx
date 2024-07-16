@@ -11,7 +11,7 @@ import {add, deleteOne, findPersonalBest, getMostRecents} from "@/app/firestore/
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "@/app/local-storage.service";
 import InfoTooltip from "@/app/utils/info-tooltip";
 import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performance";
-import {ClockWatch, ClockWatchRef} from "@/app/clock-watch";
+import {ClockWatch, ClockWatchRef} from "@/app/clockwatch/clock-watch";
 
 export default function Home() {
     const firebaseConfig = {
@@ -120,7 +120,7 @@ export default function Home() {
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                 </div>
                 {bestWorkoutPerformance ? bestWorkoutPerformanceWidget(bestWorkoutPerformance.value) : subtitle}
-                <ClockWatch ref={clockWatchChildRef}></ClockWatch>
+                <ClockWatch lastWorkoutDate={getLastWorkoutInputInLocalStorage()?.date} ref={clockWatchChildRef}></ClockWatch>
                 <div>
                     <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
                              lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
