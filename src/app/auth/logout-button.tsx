@@ -1,11 +1,11 @@
 import {AuthContextProvider, UserAuth} from "@/app/auth/auth-context";
 
-export default function Login() {
-    const { user, googleSignIn, logOut } = UserAuth();
+export default function LogoutButton() {
+    const {logOut} = UserAuth();
 
-    const handleSignIn = async () => {
+    const handleSignOut = async () => {
         try {
-            await googleSignIn();
+            await logOut();
         } catch (error) {
             console.log(error);
         }
@@ -13,9 +13,9 @@ export default function Login() {
     return (
         <>
             <AuthContextProvider>
-            <div>
-                <button onClick={handleSignIn}>Login</button>
-            </div>
+                <div>
+                    <button onClick={handleSignOut}>Log out</button>
+                </div>
             </AuthContextProvider>
         </>
     )
