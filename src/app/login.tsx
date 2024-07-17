@@ -1,4 +1,5 @@
 import {AuthContextProvider, UserAuth} from "@/app/auth/auth-context";
+import GoogleButton from "react-google-button";
 
 export default function Login() {
     const { user, googleSignIn, logOut } = UserAuth();
@@ -14,7 +15,9 @@ export default function Login() {
         <>
             <AuthContextProvider>
             <div>
-                <button onClick={handleSignIn}>Login</button>
+                <GoogleButton
+                    onClick={handleSignIn}
+                />
             </div>
             </AuthContextProvider>
         </>
