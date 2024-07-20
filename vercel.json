@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/__/auth/(.*)",
+      "destination": "https://workout-log-424900.firebaseapp.com/__/auth/$1"
+    }
+  ]
+}

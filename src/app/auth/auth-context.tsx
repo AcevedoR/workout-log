@@ -1,7 +1,7 @@
 'use client';
 
 import {createContext, useContext, useEffect, useState} from "react";
-import {GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User,} from "firebase/auth";
+import {GoogleAuthProvider, onAuthStateChanged, signInWithRedirect, signOut, User,} from "firebase/auth";
 import {auth} from "../firebase";
 
 interface UserAuth {
@@ -27,7 +27,7 @@ export const AuthContextProvider = ({children}: Readonly<{ children: React.React
 
     const googleSignIn = () => {
         const provider = new GoogleAuthProvider();
-        signInWithPopup(auth, provider);
+        signInWithRedirect(auth, provider);
     };
 
     const logOut = () => {
