@@ -8,7 +8,7 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyCeV1giwlkriJuW3MU-w1jHQCf0NpJHvy0",
-    authDomain: "localhost:3000",
+    authDomain: "workout-log-git-try-acevedors-projects.vercel.app",
     projectId: "workout-log-424900",
     storageBucket: "workout-log-424900.appspot.com",
     messagingSenderId: "705852313714",
