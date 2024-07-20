@@ -3,7 +3,7 @@
 import "./globals.css";
 import Login from "@/app/login";
 import {UserAuth} from "@/app/auth/auth-context";
-import Home from "@/app/page";
+import Home from "@/app/home";
 
 
 export default function ConnexionWallPage() {
