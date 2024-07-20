@@ -14,7 +14,7 @@ import BestWorkoutPerformance from "@/app/workout-overview/best-workout-performa
 import {ClockWatch, ClockWatchRef} from "@/app/clockwatch/clock-watch";
 import LogoutButton from "@/app/auth/logout-button";
 
-export default function Home() {
+export default function Page() {
     const firebaseConfig = {
         apiKey: "AIzaSyCeV1giwlkriJuW3MU-w1jHQCf0NpJHvy0",
         authDomain: "workout-log-424900.firebaseapp.com",
