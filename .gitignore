@@ -158,3 +158,11 @@ next-env.d.ts
 ### Vercel ###
 
 # End of https://www.toptal.com/developers/gitignore/api/vercel,nextjs,intellij+all
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+ui-debug.log
+firebase-debug.log
+firestore-debug.log

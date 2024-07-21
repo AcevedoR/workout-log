@@ -1,8 +1,8 @@
 'use client';
 
 import {createContext, useContext, useEffect, useState} from "react";
-import {GoogleAuthProvider, onAuthStateChanged, signInWithRedirect, signOut, User,} from "firebase/auth";
-import {auth} from "../firebase";
+import {GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, User,} from "firebase/auth";
+import {getWorkoutLogAuth} from "../firebase";
 
 interface UserAuth {
     user: User | null,
@@ -27,15 +27,15 @@ export const AuthContextProvider = ({children}: Readonly<{ children: React.React
 
     const googleSignIn = () => {
         const provider = new GoogleAuthProvider();
-        signInWithRedirect(auth, provider);
+        signInWithPopup(getWorkoutLogAuth(), provider);
     };
 
     const logOut = () => {
-        signOut(auth);
+        signOut(getWorkoutLogAuth());
     };
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser: User | null) => {
+        const unsubscribe = onAuthStateChanged(getWorkoutLogAuth(), (currentUser: User | null) => {
             setUser(currentUser);
         });
         return () => unsubscribe();
