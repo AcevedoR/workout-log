@@ -1,7 +1,7 @@
 import {AuthContextProvider, UserAuth} from "@/app/auth/auth-context";
 import GoogleButton from "react-google-button";
 import InfoTooltip from "@/app/utils/info-tooltip";
-import {appShortDescription} from "@/app/FeaturesConfiguration";
+import {appDevelopmentInformations, appShortDescription} from "@/app/FeaturesConfiguration";
 
 export default function Login() {
     const {user, googleSignIn, logOut} = UserAuth();
@@ -22,7 +22,7 @@ export default function Login() {
                         Workout log
                     </h1>
                     <InfoTooltip
-                        textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
+                        textToShow={appDevelopmentInformations}></InfoTooltip>
                 </div>
                 <p className="mb-6 mt-2">{appShortDescription}</p>
                 <div className="m-6">

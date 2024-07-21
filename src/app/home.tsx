@@ -13,7 +13,7 @@ import {ClockWatch, ClockWatchRef} from "@/app/clockwatch/clock-watch";
 import LogoutButton from "@/app/auth/logout-button";
 import {UserID} from "@/app/UserID";
 import {db} from "@/app/firebase";
-import {appShortDescription} from "@/app/FeaturesConfiguration";
+import {appDevelopmentInformations, appShortDescription} from "@/app/FeaturesConfiguration";
 
 export interface HomeProps {
     userID: UserID
@@ -76,7 +76,7 @@ export default function Home(props: HomeProps) {
                         Workout log
                     </h1>
                     <InfoTooltip
-                        textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
+                        textToShow={appDevelopmentInformations}></InfoTooltip>
                     <div
                         className="w-12 h-8 ml-6 rounded-md bg-rose-800	 hover:bg-red-700 text-white flex items-center justify-center text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                         <LogoutButton></LogoutButton>
