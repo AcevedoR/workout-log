@@ -27,7 +27,7 @@ export default function InfoTooltip(props: InfoTooltipProps) {
         <div>
             <button
                 className="text-gray-800 font-bold py-1 px-2 rounded-full inline-flex items-center border border-gray-400 text-xs"
-                onClick={handleClick} onMouseOver={handleMouseIn}>
+                onClick={handleClick}>
                 <FontAwesomeIcon icon={faInfo}></FontAwesomeIcon>
             </button>
             {(tooltipDisplayed) ? tooltip : <div></div>}
