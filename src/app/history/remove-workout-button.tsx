@@ -26,7 +26,7 @@ export const RemoveWorkoutButton = (
     const deleteIconButton = <FontAwesomeIcon icon={faTrashCan}></FontAwesomeIcon>;
 
     const confirmButton = <div
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded inline-flex items-center">{deleteIconButton}</div>;
+        className="bg-rose-800 hover:bg-red-700 text-white font-bold py-1 px-2 rounded inline-flex items-center">{deleteIconButton}</div>;
 
     const cancelButton = shouldConfirm ? null : (
         <button onClick={() => setShouldConfirm(true)}
