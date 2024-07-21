@@ -7,7 +7,7 @@ export interface ClockWatchRef {
 }
 
 export interface ClockWatchProps {
-    lastWorkoutDate: number | undefined;
+    getLastWorkoutDate: () => number | undefined
 }
 
 function getReferenceDate(lastWorkoutDate: number | undefined) {
@@ -19,16 +19,19 @@ function getReferenceDate(lastWorkoutDate: number | undefined) {
 }
 
 export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatchRef>) => {
-    const {lastWorkoutDate} = props;
+    const {getLastWorkoutDate} = props;
 
     const [timeToDisplay, setTimeToDisplay] = useState("");
-    const [date, setDate] = useState(new Date(getReferenceDate(lastWorkoutDate)));
+    const [date, setDate] = useState<Date>(new Date(getReferenceDate(getLastWorkoutDate())));
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
     ClockWatch.displayName = 'ClockWatch';
 
     const resetClockWatch = () => {
         if (intervalId) {
             clearInterval(intervalId)
+
+            const lastWorkoutDate = getLastWorkoutDate();// hack to always have this value up to date
+
             setDate(new Date(getReferenceDate(lastWorkoutDate)))
         }
     };

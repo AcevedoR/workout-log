@@ -83,7 +83,7 @@ export default function Home(props: HomeProps) {
                     </div>
                 </div>
                 {bestWorkoutPerformance ? bestWorkoutPerformanceWidget(bestWorkoutPerformance.value) : subtitle}
-                <ClockWatch lastWorkoutDate={getLastWorkoutInputInLocalStorage()?.date}
+                <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
                             ref={clockWatchChildRef}></ClockWatch>
                 <div>
                     <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
