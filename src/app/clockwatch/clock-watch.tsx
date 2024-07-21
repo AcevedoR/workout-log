@@ -52,7 +52,7 @@ export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatc
     }, [date])
 
     return (
-        <div className="flex flex-row justify-center items-center pt-4 text-xl">
+        <div className="flex flex-row justify-center items-center pt-2 text-xl">
             <div>{timeToDisplay}</div>
         </div>
     );

@@ -61,7 +61,7 @@ export default function Home(props: HomeProps) {
         setBestWorkoutPerformance(await findPersonalBest(userID, exercice, db));
     }
 
-    const subtitle = <p>{appShortDescription}</p>
+    const subtitle = <p className="text-xs">{appShortDescription}</p>
 
     const bestWorkoutPerformanceWidget = (bestWorkoutPerformance: Workout) => <div
         className="flex flex-col items-center mt-4">
@@ -71,14 +71,14 @@ export default function Home(props: HomeProps) {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 pt-6">
             <div>
-                <div className="text-4xl flex justify-center">
+                <div className="text-4xl flex justify-center items-center">
                     <h1>
                         Workout log
                     </h1>
                     <InfoTooltip
                         textToShow={"Hey, this minimalistic app is still in early development, the code source is open source and available here: https://github.com/AcevedoR/workout-log"}></InfoTooltip>
                     <div
-                        className="ml-10 rounded-md bg-red-500 hover:bg-red-700 text-white px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        className="w-12 h-8 ml-6 rounded-md bg-rose-800	 hover:bg-red-700 text-white flex items-center justify-center text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                         <LogoutButton></LogoutButton>
                     </div>
                 </div>
