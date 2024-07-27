@@ -31,4 +31,5 @@ jobs:
     - run: npm run lint
     - run: npm test
     - run: npx playwright install --with-deps
+    - run: curl -sL https://firebase.tools | bash
     - run: npm run test:e2e
