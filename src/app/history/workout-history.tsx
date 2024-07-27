@@ -19,10 +19,10 @@ export default function WorkoutHistory(props: WorkoutHistoryProps) {
     return (
         <div>
             <h3 className="text-center">last workouts</h3>
-            <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
+            <ul id="workout-history" role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
                 {
                     workoutList.map((workout, _i) => (
-                        <li key={workout.id} className="py-3 sm:py-4">
+                        <li id="workout-history-entry" key={workout.id} className="py-3 sm:py-4">
                             <div className="flex flex-row space-x-4 justify-between">
 
                                 <div className="text-gray-500">
