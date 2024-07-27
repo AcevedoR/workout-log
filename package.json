@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
-    "test:e2e": "export NODE_ENV=test && firebase emulators:exec 'playwright test' --only firestore",
+    "test:e2e": "export NODE_ENV=test && firebase emulators:exec 'npx playwright test' --only firestore",
     "test:e2e-ui": "export NODE_ENV=test && firebase emulators:exec 'playwright test --ui ' --only firestore",
     "emulators": "firebase emulators:start"
   },
