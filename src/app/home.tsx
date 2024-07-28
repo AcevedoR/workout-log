@@ -13,7 +13,7 @@ import {ClockWatch, ClockWatchRef} from "@/app/clockwatch/clock-watch";
 import LogoutButton from "@/app/auth/logout-button";
 import {UserID} from "@/app/UserID";
 import {db} from "@/app/firebase";
-import {appDevelopmentInformations, appShortDescription} from "@/app/FeaturesConfiguration";
+import {appDevelopmentInformations, appShortDescription, isDevModeEnabled} from "@/app/FeaturesConfiguration";
 
 export interface HomeProps {
     userID: UserID
@@ -73,7 +73,7 @@ export default function Home(props: HomeProps) {
             <div>
                 <div className="text-4xl flex justify-center items-center">
                     <h1>
-                        Workout log
+                        Workout log{isDevModeEnabled ? " dev mode" : ""}
                     </h1>
                     <InfoTooltip
                         textToShow={appDevelopmentInformations}></InfoTooltip>
