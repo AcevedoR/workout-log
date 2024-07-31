@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type {Metadata} from "next";
+import {Inter} from "next/font/google";
 import "./globals.css";
-import {Bounce, ToastContainer} from "react-toastify";
-
-const inter = Inter({ subsets: ["latin"] });
+import {ToastContainer} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
+
+const inter = Inter({subsets: ["latin"]});
 
 export const metadata: Metadata = {
     title: "Workout log",
@@ -18,8 +18,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        <body className={inter.className + " bg-secondary-beige/70"}>{children}</body>
-        <ToastContainer/>
+        <body className={inter.className + " bg-secondary-beige/70"}>
+        <main>
+            {children}
+            <ToastContainer/>
+        </main>
+        </body>
         </html>
     );
 }
