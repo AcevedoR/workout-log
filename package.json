@@ -10,7 +10,6 @@
     "test": "vitest",
     "test:e2e": "firebase emulators:exec 'npx playwright test' --only firestore",
     "test:e2e-ui": "firebase emulators:exec 'playwright test --ui' --only firestore",
-    "test:e2e-ci": "firebase emulators:exec 'playwright test' --only firestore",
     "emulators": "firebase emulators:start"
   },
   "dependencies": {
