@@ -32,4 +32,5 @@ jobs:
     - run: npm test
     - run: npx playwright install --with-deps chromium
     - run: curl -sL https://firebase.tools | bash
+    - run: firebase login
     - run: npm run test:e2e
