@@ -14,6 +14,9 @@ import LogoutButton from "@/app/auth/logout-button";
 import {UserID} from "@/app/UserID";
 import {db} from "@/app/firebase";
 import {appDevelopmentInformations, appShortDescription, isDevModeEnabled} from "@/app/FeaturesConfiguration";
+import UsualLiftWidget from "@/app/workout-overview/usual-lift-widget";
+import {UsualLift} from "@/app/model/usual-lift";
+import {findUsualLiftFromDb} from "@/app/firestore/WorkoutStatisticsFirestore";
 
 export interface HomeProps {
     userID: UserID
@@ -27,11 +30,13 @@ export default function Home(props: HomeProps) {
         saveLastWorkoutInputInLocalStorage(input.workout);
         getWorkoutRecentHistory();
         findBestWorkoutPerformance(input.workout.exercise);
+        findUsualLift(input.workout.exercise);
         resetClockWatch();
     }
 
     const onExerciseSelected = (e: { exercise: string }) => {
         findBestWorkoutPerformance(e.exercise);
+        findUsualLift(e.exercise);
     }
 
     const onWorkoutDelete = async (workoutId: string) => {
@@ -48,6 +53,11 @@ export default function Home(props: HomeProps) {
 
     useEffect(() => {
         getWorkoutRecentHistory();
+        let lastWorkoutInputInLocalStorage = getLastWorkoutInputInLocalStorage();
+        if (lastWorkoutInputInLocalStorage) {
+            findBestWorkoutPerformance(lastWorkoutInputInLocalStorage.exercise);
+            findUsualLift(lastWorkoutInputInLocalStorage.exercise);
+        }
     }, []);
 
     const getWorkoutRecentHistory = async () => {
@@ -57,16 +67,16 @@ export default function Home(props: HomeProps) {
     }
 
     const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow | undefined>(undefined);
+    const [usualLift, setUsualLift] = useState<UsualLift | undefined>(undefined);
+
     const findBestWorkoutPerformance = async (exercice: string) => {
         setBestWorkoutPerformance(await findPersonalBest(userID, exercice, db));
     }
+    const findUsualLift = async (exercice: string) => {
+        setUsualLift(await findUsualLiftFromDb(userID, exercice, db));
+    }
 
     const subtitle = <p className="text-xs">{appShortDescription}</p>
-
-    const bestWorkoutPerformanceWidget = (bestWorkoutPerformance: Workout) => <div
-        className="flex flex-col items-center mt-4">
-        <BestWorkoutPerformance personalBestWorkout={bestWorkoutPerformance}></BestWorkoutPerformance>
-    </div>;
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 pt-6">
@@ -82,7 +92,25 @@ export default function Home(props: HomeProps) {
                         <LogoutButton></LogoutButton>
                     </div>
                 </div>
-                {bestWorkoutPerformance ? bestWorkoutPerformanceWidget(bestWorkoutPerformance.value) : subtitle}
+                <div className="flex flex-row justify-evenly">
+                    {bestWorkoutPerformance ?
+                        <div
+                            className="flex flex-col items-center mt-4">
+                            <BestWorkoutPerformance
+                                personalBestWorkout={bestWorkoutPerformance.value}></BestWorkoutPerformance>
+                        </div>
+                        : <></>
+                    }
+                    {usualLift ?
+                        <div
+                            className="flex flex-col items-center mt-4">
+                            <UsualLiftWidget
+                                usualLift={usualLift}></UsualLiftWidget>
+                        </div>
+                        : <></>
+                    }
+                </div>
+                {!bestWorkoutPerformance && !usualLift ? subtitle : <></>}
                 <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
                             ref={clockWatchChildRef}></ClockWatch>
                 <div>

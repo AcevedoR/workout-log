@@ -82,10 +82,12 @@ export async function findPersonalBest(userId: string, exercise: string, db: Fir
         );
 
         let found = undefined;
+        if(querySnapshot.size > 1){
+            throw new Error("findPersonalBest returned more than one result");
+        }
         querySnapshot.forEach((doc) => {
-            console.info("found: " + JSON.stringify({id: doc.id, value: doc.data() as Workout}))
+            console.info("found personal best: " + JSON.stringify({id: doc.id, value: doc.data() as Workout}))
             found = {id: doc.id, value: doc.data() as Workout};
-            return
         });
         return found;
     } catch
