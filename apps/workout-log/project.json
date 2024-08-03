@@ -1,0 +1,29 @@
+{
+  "name": "workout-log",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/workout-log/src",
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/workout-log",
+        "command": "firebase emulators:exec 'npx playwright test' --only firestore"
+      }
+    },
+    "e2e-ui": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/workout-log",
+        "command": "firebase emulators:exec 'npx playwright test --ui' --only firestore"
+      }
+    },
+    "emulators": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/workout-log",
+        "command": "firebase emulators:start"
+      }
+    }
+  }
+}

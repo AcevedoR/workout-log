@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "plugin:playwright/recommended",
+    "next/core-web-vitals",
+    "../../.eslintrc.json"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "e2e/**/*.{ts,js,tsx,jsx}"
+      ],
+      "rules": {}
+    }
+  ]
+}
