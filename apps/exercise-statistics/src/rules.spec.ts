@@ -1,6 +1,8 @@
 import {beforeAll, describe, expect, it, vi} from "vitest";
-import {UserRecord} from "firebase-admin/lib/auth";
+import {auth} from "firebase-admin";
+
 import {wasUserActiveLast24h} from "./rules";
+import UserRecord = auth.UserRecord;
 
 
 describe('business rules', () => {

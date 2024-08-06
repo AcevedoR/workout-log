@@ -17,10 +17,6 @@
         "cwd": "./apps/exercise-statistics",
         "command": "firebase emulators:start"
       }
-    },
-    "test": {
-      "executor": "@nx/vite:test",
-
     }
   }
 }
