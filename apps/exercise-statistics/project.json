@@ -1,0 +1,26 @@
+{
+  "name": "exercise-statistics",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/exercise-statistics",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/exercise-statistics",
+        "command": "tsc"
+      }
+    },
+    "emulators": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/exercise-statistics",
+        "command": "firebase emulators:start"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+
+    }
+  }
+}
