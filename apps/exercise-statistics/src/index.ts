@@ -8,55 +8,53 @@ import {onRequest} from "firebase-functions/v2/https";
 
 // The Firebase Admin SDK to access Firestore.
 import {initializeApp} from "firebase-admin/app";
-import {getFirestore} from "firebase-admin/firestore";
 import {getAuth} from "firebase-admin/auth";
-import {auth} from "firebase-admin";
-import {wasUserActiveLast24h} from "./rules";
+import {UserID} from "../../workout-log/src/app/UserID";
+import {getExercisesToProcessForUser, getLastWorkoutsForExercise} from "./WorkoutLogRepository";
+import {upsertExerciseStatistics} from "./ExerciseStatisticsRepository";
+import {wasUserActiveLast24h} from "./domain/UserActivity";
+import {calculateUsualLift} from "./domain/CalculateUsualLift";
 
 initializeApp();
 
+
+const MAX_HANDLED_USER_COUNT = 20;
+
 export const calculate = onRequest(async (req, res) => {
     logger.log("Starting function");
-    const maxHandledUserCount = 20;
     let userProcessed = 0;
+    let exercisesProcessed = 0;
+
     await getAuth()
-        .listUsers(maxHandledUserCount)
+        .listUsers(MAX_HANDLED_USER_COUNT)
         .then((listUsersResult) => {
-            listUsersResult.users.forEach((userRecord) => {
+            listUsersResult.users.forEach(async (userRecord) => {
                 if (wasUserActiveLast24h(userRecord)) {
-                    // todo
+
+                    const exercisesToProcessForUser = await getExercisesToProcessForUser(userRecord.uid as UserID);
+
+                    for (const exercise of exercisesToProcessForUser) {
+                        const lastWorkouts = await getLastWorkoutsForExercise(exercise);
+                        const usualLift = calculateUsualLift(lastWorkouts);
+                        if (usualLift != null) {
+                            await upsertExerciseStatistics({userId: userRecord.uid, usualLift});
+                            exercisesProcessed++;
+                        }
+                    }
+
                     userProcessed++;
                 }
             });
             if (listUsersResult.pageToken) {
-                console.error(`Critical warning, there is more than :${maxHandledUserCount} in database`);
+                console.error(`Critical warning, there is more than :${MAX_HANDLED_USER_COUNT} in database`);
             }
         })
         .catch((error) => {
             console.error('Error listing users:', error);
         });
 
-    const exercisesToProcessForUser = getFirestore()
-        .collection("workout-log")
-        .where("exercise", "==", exercise)
-        .orderBy('date', 'desc')
-        .limit(10);
-
-    const exercise = "Squat";
-    const lastExercises = getFirestore()
-        .collection("workout-log")
-        .where("exercise", "==", exercise)
-        .orderBy('date', 'desc')
-        .limit(10);
-    // Push the new message into Firestore using the Firebase Admin SDK.
-    // const writeResult = await getFirestore()
-    //     .collection("messages")
-    //     .add({original: original});
-    // Send back a message that we've successfully written the message
-    res.json({result: `hey back ${req.query} ${req.body}`});
+    let resultMessage = `processed ${userProcessed} users and ${exercisesProcessed} exercises`;
+    console.info(resultMessage);
+    res.json({result: resultMessage});
 });
 
-export async function calculateUsualLift() {
-    // firestore smart query
-    //
-}

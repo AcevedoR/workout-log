@@ -3,6 +3,7 @@ import UserRecord = auth.UserRecord;
 
 const RECENTLY: number = 1000 * 60 * 60 * 24;
 
+
 export function wasUserActiveLast24h(userRecord: UserRecord): boolean {
     if (!userRecord.metadata || !userRecord.metadata.lastSignInTime) {
         throw new Error(`Not enough information to find if user is active, User id: ${userRecord.uid}, UserRecord: ${JSON.stringify(userRecord)}`);

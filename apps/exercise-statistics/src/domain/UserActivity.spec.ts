@@ -1,11 +1,11 @@
 import {beforeAll, describe, expect, it, vi} from "vitest";
 import {auth} from "firebase-admin";
 
-import {wasUserActiveLast24h} from "./rules";
 import UserRecord = auth.UserRecord;
+import {wasUserActiveLast24h} from "./UserActivity";
 
 
-describe('business rules', () => {
+describe('active users test', () => {
     beforeAll(async () => {
         vi.useFakeTimers()
         vi.setSystemTime(Date.parse('Sat, 03 Feb 2001 00:00:00 GMT'))
@@ -43,7 +43,6 @@ describe('business rules', () => {
             })
         )).toBeFalsy();
     })
-
 })
 
 function createFakeUser(input: { creationTime: string, lastSignInTime: string, lastRefreshTime?: string }): UserRecord {
