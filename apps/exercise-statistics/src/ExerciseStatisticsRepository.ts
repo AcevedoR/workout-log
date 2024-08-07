@@ -19,15 +19,16 @@ export async function upsertExerciseStatistics(input: { userId: UserID, usualLif
             }
         }
         const collectionReference = getFirestore().collection(EXERCISE_STATISTICS_COLLECTION);
+        let dataToInsert = JSON.parse(JSON.stringify(data));
         await collectionReference
             .doc(getExerciseStatisticsId(input.userId, input.usualLift))
             .set(
-                data
+                dataToInsert
             )
-        trace(`upsertExerciseStatistics end`);
+        trace(`upsertExerciseStatistics end, inserted data: ${JSON.stringify(dataToInsert)}`);
     } catch
         (e: any) {
-        console.log('Unsuccessful' + e)
+        console.error('Unsuccessful', e)
     }
 }
 

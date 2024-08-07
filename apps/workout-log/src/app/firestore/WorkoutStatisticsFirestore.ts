@@ -1,4 +1,4 @@
-import {collection, Firestore, getDocs, limit, query, where} from "@firebase/firestore";
+import {collection, doc, Firestore, getDoc, limit, query, where} from "@firebase/firestore";
 import {UsualLift} from "../model/usual-lift";
 import {ExerciseStatistics} from "./exercise-statistics";
 import {UserID} from "../UserID";
@@ -7,37 +7,24 @@ const EXERCISE_STATISTICS_COLLECTION = "exercise-statistics";
 
 export async function findUsualLiftFromDb(userId: UserID, exercise: string, db: Firestore): Promise<UsualLift | undefined> {
     try {
-        const exerciseStatisticsCollection = collection(db, EXERCISE_STATISTICS_COLLECTION);
 
         console.info("findUsualLiftFromDb: " + exercise + " " + userId)
-        const querySnapshot = await getDocs(
-            query(exerciseStatisticsCollection,
-                where("userId", "==", userId),
-                where("exercise", "==", exercise),
-                limit(1)
-            )
+        const docSnapshot = await getDoc(
+            doc(db, EXERCISE_STATISTICS_COLLECTION, `${userId}-${exercise}`)// TODO put this in common with cloud function
         );
 
-        let found: ExerciseStatistics | undefined;
-        if (querySnapshot.size > 1) {
-            throw new Error("findUsualLiftFromDb returned more than one result");
-        }
-        querySnapshot.forEach((doc) => {
-            found = doc.data() as ExerciseStatistics;
-            console.info("found usual lift: " + JSON.stringify(found))
-        });
-        if (found) {
+        if (docSnapshot.exists()) {
+            const found = docSnapshot.data() as ExerciseStatistics;
+            console.info("found exercise statistics: " + JSON.stringify(found))
             return {
                 exercise: found.exercise,
                 reps: found.usualLift.reps,
                 weight: found.usualLift.weight,
             } as UsualLift;
-        } else {
-            return undefined;
         }
     } catch
         (e: any) {
-        console.log('Unsuccessful' + e)
+        console.error('Unsuccessful', e)
     }
     return undefined;
 }
