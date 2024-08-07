@@ -1,7 +1,7 @@
 {
   "name": "exercise-statistics",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/exercise-statistics/src/index.js",
   "type": "module",
   "engines": {
     "node": "22"

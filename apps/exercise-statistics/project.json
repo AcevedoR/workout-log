@@ -11,6 +11,13 @@
         "command": "tsc"
       }
     },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/exercise-statistics",
+        "command": "tsc --watch"
+      }
+    },
     "emulators": {
       "executor": "nx:run-commands",
       "options": {

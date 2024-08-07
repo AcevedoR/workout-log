@@ -1,13 +1,14 @@
-import {UserID} from "../../workout-log/src/app/UserID";
+import {UserID} from "../../workout-log/src/app/UserID.js";
 import {getFirestore} from "firebase-admin/firestore";
-import {Workout} from "../../workout-log/src/app/workout";
+import {Workout} from "../../workout-log/src/app/workout.js";
+import {trace} from "./logger.js";
 
 const WORKOUT_LOG_COLLECTION = "workout-log";
 
 export async function getExercisesToProcessForUser(userId: UserID): Promise<string[]> {
     const lastLogsQuery = await getFirestore()
         .collection(WORKOUT_LOG_COLLECTION)
-        .where("user", "==", userId)
+        .where("userId", "==", userId)
         .limit(100)
         .get();
 
@@ -17,7 +18,10 @@ export async function getExercisesToProcessForUser(userId: UserID): Promise<stri
         exercises.push(workout.exercise);
     });
 
-    return Array.from(new Set(exercises))
+
+    let distinctExercises = Array.from(new Set(exercises));
+    trace(`getExercisesToProcessForUser: found ${distinctExercises.length} exercises for user: ${userId}`);
+    return distinctExercises
 }
 
 export async function getLastWorkoutsForExercise(exercise: string) : Promise<Workout[]> {
@@ -33,6 +37,8 @@ export async function getLastWorkoutsForExercise(exercise: string) : Promise<Wor
         let workout = doc.data() as Workout;
         workouts.push(workout);
     });
+
+    trace(`getLastWorkoutsForExercise: found ${workouts.length} workouts`);
 
     return workouts;
 }

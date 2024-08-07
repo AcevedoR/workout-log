@@ -22,7 +22,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/workout-log",
-        "command": "firebase emulators:start"
+        "command": "firebase emulators:start --import ../../firebase-emulators-data"
       }
     }
   }

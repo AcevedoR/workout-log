@@ -1,5 +1,5 @@
-import {Workout} from "../../../workout-log/src/app/workout";
-import {UsualLift, UsualLiftRange} from "../../../workout-log/src/app/model/usual-lift";
+import {Workout} from "../../../workout-log/src/app/workout.js";
+import {UsualLift, UsualLiftRange} from "./usual-lift.js";
 
 const WORKOUT_MINIMUM_COUNT_REQUIRED_FOR_CALCULUS = 3;
 
