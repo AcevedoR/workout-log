@@ -4,7 +4,7 @@
   "main": "dist/exercise-statistics/src/index.js",
   "type": "module",
   "engines": {
-    "node": "22"
+    "node": ">=20"
   },
   "scripts": {},
   "author": "",
