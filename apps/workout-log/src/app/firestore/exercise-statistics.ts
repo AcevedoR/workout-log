@@ -5,6 +5,7 @@ export interface ExerciseStatistics {
     usualLift: {
         reps: number | UsualLiftRange,
         weight: number
-    }
+    },
+    userId: string,
     _updatedDate: number
 }

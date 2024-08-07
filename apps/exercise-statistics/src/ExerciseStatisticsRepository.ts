@@ -12,6 +12,7 @@ export async function upsertExerciseStatistics(input: { userId: UserID, usualLif
 
         const data: ExerciseStatistics = {
             _updatedDate: Date.now(),
+            userId: input.userId,
             exercise: input.usualLift.exercise,
             usualLift: {
                 reps: input.usualLift.reps,
