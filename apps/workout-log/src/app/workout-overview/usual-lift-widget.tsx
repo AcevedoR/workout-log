@@ -14,7 +14,7 @@ export default function UsualLiftWidget(props: UsualLiftWidgetProps) {
             <div className="flex items-center space-x-4 mt-3">
                 <div className="flex items-center space-x-2">
                     <div className="inline-flex items-center text-base font-semibold text-gray-900">
-                        {usualLift.reps}
+                        {typeof usualLift.reps === 'number' ? usualLift.reps : `${usualLift.reps.begin}-${usualLift.reps.end}`}
                     </div>
                     <div className="inline-flex items-center text-base font-semibold text-gray-900">
                         x

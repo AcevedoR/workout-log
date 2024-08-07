@@ -27,6 +27,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
+    - run: npx nx build exercise-statistics
+    - run: npx nx test exercise-statistics
     - run: npx nx build workout-log
     #- run: npx nx lint workout-log TODO
     - run: npx nx test workout-log

@@ -28,7 +28,7 @@ export async function add(userId: string, workout: Workout, db: Firestore) {
         );
     } catch
         (e: any) {
-        console.log('Unsuccessful' + e)
+        console.error('Unsuccessful', e)
     }
 }
 
@@ -39,7 +39,7 @@ export async function deleteOne(workoutId: string, db: Firestore) {
         );
     } catch
         (e: any) {
-        console.log('Unsuccessful' + e)
+        console.error('Unsuccessful', e)
     }
 }
 
@@ -61,7 +61,7 @@ export async function getMostRecents(userId: string, lasts: number, db: Firestor
         return res;
     } catch
         (e: any) {
-        console.log('Unsuccessful' + e)
+        console.error('Unsuccessful', e)
     }
     return [];
 }
@@ -92,7 +92,7 @@ export async function findPersonalBest(userId: string, exercise: string, db: Fir
         return found;
     } catch
         (e: any) {
-        console.log('Unsuccessful' + e)
+        console.error('Unsuccessful', e)
     }
     return undefined;
 }

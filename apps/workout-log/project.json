@@ -8,21 +8,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/workout-log",
-        "command": "firebase emulators:exec 'npx playwright test' --only firestore"
+        "command": "firebase emulators:exec 'npx playwright test' --import ../../firebase-emulators-data"
       }
     },
     "e2e-ui": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/workout-log",
-        "command": "firebase emulators:exec 'npx playwright test --ui' --only firestore"
+        "command": "firebase emulators:exec 'npx playwright test --ui' --import ../../firebase-emulators-data"
       }
     },
     "emulators": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/workout-log",
-        "command": "firebase emulators:start"
+        "command": "firebase emulators:start --import ../../firebase-emulators-data"
       }
     }
   }
