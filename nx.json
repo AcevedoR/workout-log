@@ -4,14 +4,20 @@
     "lint": {
       "cache": true
     },
+    "build": {
+      "dependsOn": ["^build", "prebuild"]
+    },
     "test": {
-      "cache": true
+      "cache": true,
+      "dependsOn": ["build"]
     },
-    "test:e2e": {
-      "cache": true
+    "e2e": {
+      "cache": true,
+      "dependsOn": ["build"]
     },
-    "test:e2e-ui": {
-      "cache": true
+    "e2e-ui": {
+      "cache": true,
+      "dependsOn": ["build"]
     }
   },
   "defaultBase": "main",
