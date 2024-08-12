@@ -2,7 +2,7 @@ import {auth} from "firebase-admin";
 import UserRecord = auth.UserRecord;
 import {trace} from "../logger.js";
 
-const RECENTLY: number = 1000 * 60 * 60 * 24;
+const RECENTLY_IN_MILLISECONDS: number = 1000 * 60 * 60 * 24;
 
 
 export function wasUserActiveLast24h(userRecord: UserRecord): boolean {
@@ -16,13 +16,13 @@ export function wasUserActiveLast24h(userRecord: UserRecord): boolean {
 }
 
 function userSignedInRecently(userRecord: UserRecord) {
-    let x = (Date.now() - Date.parse(userRecord.metadata.lastSignInTime)) <= RECENTLY;
+    let x = (Date.now() - Date.parse(userRecord.metadata.lastSignInTime)) <= RECENTLY_IN_MILLISECONDS;
     trace(`userSignedInRecently: ${x}`);
     return x;
 }
 
 function userRefreshedTokenRecently(userRecord: UserRecord) {
-    let x = (userRecord.metadata.lastRefreshTime !== undefined && userRecord.metadata.lastRefreshTime !== null) && (Date.now() - Date.parse(userRecord.metadata.lastRefreshTime)) <= RECENTLY;
+    let x = (userRecord.metadata.lastRefreshTime !== undefined && userRecord.metadata.lastRefreshTime !== null) && (Date.now() - Date.parse(userRecord.metadata.lastRefreshTime)) <= RECENTLY_IN_MILLISECONDS;
     trace(`userRefreshedTokenRecently: ${x}`);
     return x;
 }
