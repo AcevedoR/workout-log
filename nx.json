@@ -5,6 +5,7 @@
       "cache": true
     },
     "build": {
+      "cache": true,
       "dependsOn": ["^build", "prebuild"]
     },
     "test": {
