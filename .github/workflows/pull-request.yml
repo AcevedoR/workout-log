@@ -21,14 +21,16 @@ jobs:
 
     env:
       GOOGLE_APPLICATION_CREDENTIALS: google-application-credentials.json
+      GOOGLE_APPLICATION_CREDENTIALS_CONTENT: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }}
 
     steps:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: "prepare GCP auth"
-      run: echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }}" > "google-application-credentials.json"
-
+      run: echo "$GOOGLE_APPLICATION_CREDENTIALS_CONTENT" > "google-application-credentials.json"
+    - run: echo GOOGLE_APPLICATION_CREDENTIALS_CONTENT
+    - run: ls -l
     - name: Use Node.js 20.x
       uses: actions/setup-node@v3
       with:
