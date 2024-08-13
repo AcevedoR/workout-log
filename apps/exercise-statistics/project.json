@@ -32,7 +32,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/exercise-statistics",
-        "command": "firebase deploy --only functions --token \"$FIREBASE_TOKEN\""
+        "command": "firebase deploy --only functions --token \"$FIREBASE_TOKEN\" --debug"
       }
     }
   }
