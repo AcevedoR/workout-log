@@ -33,8 +33,7 @@
       "options": {
         "cwd": "./apps/exercise-statistics",
         "command": "firebase deploy --only functions"
-      },
-      "dependsOn": ["e2e"]
+      }
     }
   }
 }

@@ -18,6 +18,9 @@
     "e2e-ui": {
       "cache": true,
       "dependsOn": ["build"]
+    },
+    "deploy": {
+      "dependsOn": ["^e2e","e2e"]
     }
   },
   "defaultBase": "main",
