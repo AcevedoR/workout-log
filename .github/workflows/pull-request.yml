@@ -27,11 +27,12 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+    - run: pwd
+    - run: ls -l
     - name: "prepare GCP auth"
       run: echo "$GOOGLE_APPLICATION_CREDENTIALS_CONTENT" > "/google-application-credentials.json"
     - run: ls -l /
-    - run: pwd
-    - run: ls -l
+
     - name: Use Node.js 20.x
       uses: actions/setup-node@v3
       with:
