@@ -23,7 +23,18 @@
       "options": {
         "cwd": "./apps/exercise-statistics",
         "command": "firebase emulators:start"
-      }
+      },
+      "dependsOn": [
+        "build"
+      ]
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/exercise-statistics",
+        "command": "firebase deploy --only functions"
+      },
+      "dependsOn": ["e2e"]
     }
   }
 }

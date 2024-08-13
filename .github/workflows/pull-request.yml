@@ -4,10 +4,13 @@
 name: Node.js CI
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
+# Needed for nx-set-shas when run on the main branch
+permissions:
+  actions: read
+  contents: read
 
 jobs:
   build:
@@ -21,17 +24,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: npx nx build exercise-statistics
-    - run: npx nx test exercise-statistics
-    - run: npx nx build workout-log
-    #- run: npx nx lint workout-log TODO
-    - run: npx nx test workout-log
+    - uses: nrwl/nx-set-shas@v4
+    - run: npx nx affected -t test build
     - run: npx playwright install --with-deps chromium
     - run: npm install -g firebase-tools
-    - run: npx nx e2e workout-log
+    - run: npx nx affected -t e2e
