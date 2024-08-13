@@ -31,7 +31,9 @@ jobs:
     - name: "prepare GCP auth"
       run: echo "$GOOGLE_APPLICATION_CREDENTIALS_CONTENT" > "google-application-credentials.json"
     - run: export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/google-application-credentials.json"
+    - run: echo "GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/google-application-credentials.json" >> $GITHUB_ENV
     - run: echo $GOOGLE_APPLICATION_CREDENTIALS
+    - run: echo ${{ env.GOOGLE_APPLICATION_CREDENTIALS }}
 
     - name: Use Node.js 20.x
       uses: actions/setup-node@v3
