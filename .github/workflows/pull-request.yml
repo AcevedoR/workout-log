@@ -20,7 +20,6 @@ jobs:
 #      image: mcr.microsoft.com/playwright:v1.46.0-jammy
 
     env:
-      GOOGLE_APPLICATION_CREDENTIALS: "/google-application-credentials.json"
       GOOGLE_APPLICATION_CREDENTIALS_CONTENT: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }}
 
     steps:
@@ -30,8 +29,9 @@ jobs:
     - run: pwd
     - run: ls -l
     - name: "prepare GCP auth"
-      run: echo "$GOOGLE_APPLICATION_CREDENTIALS_CONTENT" > "/google-application-credentials.json"
-    - run: ls -l /
+      run: echo "$GOOGLE_APPLICATION_CREDENTIALS_CONTENT" > "google-application-credentials.json"
+    - run: export GOOGLE_APPLICATION_CREDENTIALS="$(pwd)/google-application-credentials.json"
+    - run: echo $GOOGLE_APPLICATION_CREDENTIALS
 
     - name: Use Node.js 20.x
       uses: actions/setup-node@v3
