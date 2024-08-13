@@ -47,6 +47,5 @@ jobs:
     - run: npx nx affected -t deploy
     - name: "Remove GCP credentials file"
       if: success() || failure()
-      run: |
-        rm google-application-credentials.json
+      run: rm google-application-credentials.json
 
