@@ -2,11 +2,16 @@
 A minimalistic application to help you log your gym workout sessions
 
 ## run local
+```
+# install dependencies
 npm i
-npm run dev
+
+# run local firebase emulators (eg: firestore, functions)
+npx nx emulators workout-log
+
+# run NextJS front end
+npx nx dev workout-log
+```
  
 ## live beta
-App is availble at https://workout-log-weld.vercel.app/
-
-## TODO 
-todo: watch https://www.youtube.com/watch?v=zrjybW3UKr8&ab_channel=Rifik 
+App is publicly available as preview at https://workout-log-weld.vercel.app/
