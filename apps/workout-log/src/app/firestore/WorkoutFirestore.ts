@@ -8,6 +8,7 @@ import {
     limit,
     orderBy,
     query,
+    QueryConstraint,
     where
 } from "@firebase/firestore";
 import {Workout, WorkoutRow} from "../workout";
@@ -43,12 +44,23 @@ export async function deleteOne(workoutId: string, db: Firestore) {
     }
 }
 
-export async function getMostRecents(userId: string, lasts: number, db: Firestore): Promise<WorkoutRow[]> {
+export async function getMostRecents(db: Firestore, userId: string, lasts: number, options?: {
+    exercise?: string
+}): Promise<WorkoutRow[]> {
     try {
         const workoutLogCollection = collection(db, WORKOUT_LOG_COLLECTION);
-        let query1 = query(workoutLogCollection,
-            where("userId", "==", userId),
-            orderBy("date", "desc"), limit(lasts)
+        const queryConstraints: QueryConstraint[] = [
+            where("userId", "==", userId)
+        ];
+        if (options?.exercise) {
+            queryConstraints.push(where("exercise", "==", options.exercise));
+        }
+        queryConstraints.push(orderBy("date", "desc"));
+        queryConstraints.push(limit(lasts));
+
+        let query1 = query(
+            workoutLogCollection,
+            ...queryConstraints
         );
 
         const querySnapshot = await getDocs(query1);
@@ -82,7 +94,7 @@ export async function findPersonalBest(userId: string, exercise: string, db: Fir
         );
 
         let found = undefined;
-        if(querySnapshot.size > 1){
+        if (querySnapshot.size > 1) {
             throw new Error("findPersonalBest returned more than one result");
         }
         querySnapshot.forEach((doc) => {
