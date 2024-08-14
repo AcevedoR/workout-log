@@ -3,7 +3,7 @@
 import LogForm from "./form/log-form";
 import {Workout, WorkoutRow} from "./workout";
 import {useEffect, useRef, useState} from "react";
-import WorkoutHistory from "./history/workout-history";
+import WorkoutShortHistory from "./history/workout-history";
 
 import {add, deleteOne, findPersonalBest, getMostRecents} from "./firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "./local-storage.service";
@@ -61,8 +61,7 @@ export default function Home(props: HomeProps) {
     }, []);
 
     const getWorkoutRecentHistory = async () => {
-        console.log("getWorkoutRecentHistory");
-        const mostRecentWorkouts = await getMostRecents(userID, 10, db);
+        const mostRecentWorkouts = await getMostRecents(db, userID, 10);
         setWorkoutRecentHistory(mostRecentWorkouts);
     }
 
@@ -118,8 +117,8 @@ export default function Home(props: HomeProps) {
                              lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
                     </LogForm>
                 </div>
-                <WorkoutHistory workoutList={workoutRecentHistory}
-                                onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutHistory>
+                <WorkoutShortHistory workoutList={workoutRecentHistory}
+                                onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutShortHistory>
             </div>
         </main>
     );
