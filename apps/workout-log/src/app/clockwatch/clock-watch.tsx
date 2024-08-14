@@ -17,11 +17,19 @@ function getReferenceDate(lastWorkoutDate: number | undefined) {
         return new Date();
     }
 }
+export function displayClockWatch(startDate: Date): {seconds: number, minutes: number} | null {
+    let dateDiffInSecondsAndMinutes = getDateDiffInSecondsAndMinutes(new Date(), startDate);
+    if(dateDiffInSecondsAndMinutes.minutes >= 60){
+        return null
+    } else {
+        return dateDiffInSecondsAndMinutes;
+    }
+}
 
 export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatchRef>) => {
     const {getLastWorkoutDate} = props;
 
-    const [timeToDisplay, setTimeToDisplay] = useState("");
+    const [timeToDisplay, setTimeToDisplay] = useState<string | null>(null);
     const [date, setDate] = useState<Date>(new Date(getReferenceDate(getLastWorkoutDate())));
     const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
     ClockWatch.displayName = 'ClockWatch';
@@ -42,10 +50,16 @@ export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatc
 
     useEffect(() => {
         const id = setInterval(() => {
-            const {seconds, minutes} = getDateDiffInSecondsAndMinutes(new Date(), date);
+            const timeToDisplayInMinutesAndSeconds = displayClockWatch(date);
+            if(timeToDisplayInMinutesAndSeconds) {
 
-            const currentTime = minutes + ' : ' + seconds;
-            setTimeToDisplay(currentTime);
+                const {seconds, minutes} = timeToDisplayInMinutesAndSeconds;
+
+                const currentTime = minutes + ' : ' + seconds;
+                setTimeToDisplay(currentTime);
+            } else {
+                setTimeToDisplay(null);
+            }
         }, 1000)
         setIntervalId(id)
         return () => clearInterval(id);
@@ -53,7 +67,9 @@ export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatc
 
     return (
         <div className="flex flex-row justify-center items-center pt-2 text-xl">
-            <div>{timeToDisplay}</div>
+            {timeToDisplay ?
+                <div data-testid="custom-element" role={"meter"}>{timeToDisplay}</div> : <></>
+            }
         </div>
     );
 });
