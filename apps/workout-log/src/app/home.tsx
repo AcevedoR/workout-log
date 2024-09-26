@@ -2,8 +2,8 @@
 
 import LogForm from "./form/log-form";
 import {Workout, WorkoutRow} from "./workout";
-import {useEffect, useRef, useState} from "react";
-import WorkoutShortHistory from "./history/workout-history";
+import React, {useEffect, useRef, useState} from "react";
+import WorkoutShortHistory from "./history/workout-short-history";
 
 import {add, deleteOne, findPersonalBest, getMostRecents} from "./firestore/WorkoutFirestore";
 import {getLastWorkoutInputInLocalStorage, saveLastWorkoutInputInLocalStorage} from "./local-storage.service";
@@ -17,6 +17,7 @@ import {appDevelopmentInformations, appShortDescription, isDevModeEnabled} from 
 import UsualLiftWidget from "./workout-overview/usual-lift-widget";
 import {UsualLift} from "./model/usual-lift";
 import {findUsualLiftFromDb} from "./firestore/WorkoutStatisticsFirestore";
+import WorkoutHistoryPage from "./history/workout-history-page";
 
 export interface HomeProps {
     userID: UserID
@@ -34,7 +35,10 @@ export default function Home(props: HomeProps) {
         resetClockWatch();
     }
 
+    const [displayWorkoutHistoryPage, setDisplayWorkoutHistoryPage] = useState<boolean>(false);
+    const [currentSelectedExercise, setCurrentSelectedExercise] = useState<string | null>(null);
     const onExerciseSelected = (e: { exercise: string }) => {
+        setCurrentSelectedExercise(e.exercise)
         findBestWorkoutPerformance(e.exercise);
         findUsualLift(e.exercise);
     }
@@ -57,10 +61,12 @@ export default function Home(props: HomeProps) {
         if (lastWorkoutInputInLocalStorage) {
             findBestWorkoutPerformance(lastWorkoutInputInLocalStorage.exercise);
             findUsualLift(lastWorkoutInputInLocalStorage.exercise);
+            setCurrentSelectedExercise(lastWorkoutInputInLocalStorage.exercise)
         }
     }, []);
 
     const getWorkoutRecentHistory = async () => {
+        console.log("getWorkoutRecentHistory");
         const mostRecentWorkouts = await getMostRecents(db, userID, 10);
         setWorkoutRecentHistory(mostRecentWorkouts);
     }
@@ -76,10 +82,11 @@ export default function Home(props: HomeProps) {
     }
 
     const subtitle = <p className="text-xs">{appShortDescription}</p>
-
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-10 pt-6">
             <div>
+
+
                 <div className="text-4xl flex justify-center items-center">
                     <h1>
                         Workout log{isDevModeEnabled ? " dev mode" : ""}
@@ -91,35 +98,55 @@ export default function Home(props: HomeProps) {
                         <LogoutButton></LogoutButton>
                     </div>
                 </div>
-                <div className="flex flex-row justify-evenly">
-                    {bestWorkoutPerformance ?
-                        <div
-                            className="flex flex-col items-center mt-4">
-                            <BestWorkoutPerformance
-                                personalBestWorkout={bestWorkoutPerformance.value}></BestWorkoutPerformance>
+
+                {displayWorkoutHistoryPage && currentSelectedExercise ?
+                    <WorkoutHistoryPage db={db} userID={userID} exercice={currentSelectedExercise}
+                                        setDisplayWorkoutHistoryPage={setDisplayWorkoutHistoryPage}></WorkoutHistoryPage>
+                    :
+                    <>
+                        <div className="flex flex-row justify-evenly">
+                            {bestWorkoutPerformance ?
+                                <div
+                                    className="flex flex-col items-center mt-4">
+                                    <BestWorkoutPerformance
+                                        personalBestWorkout={bestWorkoutPerformance.value}></BestWorkoutPerformance>
+                                </div>
+                                : <></>
+                            }
+                            {usualLift ?
+                                <div
+                                    className="flex flex-col items-center mt-4">
+                                    <UsualLiftWidget
+                                        usualLift={usualLift}></UsualLiftWidget>
+                                </div>
+                                : <></>
+                            }
                         </div>
-                        : <></>
-                    }
-                    {usualLift ?
-                        <div
-                            className="flex flex-col items-center mt-4">
-                            <UsualLiftWidget
-                                usualLift={usualLift}></UsualLiftWidget>
+                        {!bestWorkoutPerformance && !usualLift ? subtitle : <></>}
+
+                        <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
+                                    ref={clockWatchChildRef}></ClockWatch>
+                        <div>
+                            <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
+                                     lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
+                            </LogForm>
                         </div>
-                        : <></>
-                    }
-                </div>
-                {!bestWorkoutPerformance && !usualLift ? subtitle : <></>}
-                <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
-                            ref={clockWatchChildRef}></ClockWatch>
-                <div>
-                    <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
-                             lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
-                    </LogForm>
-                </div>
-                <WorkoutShortHistory workoutList={workoutRecentHistory}
-                                onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutShortHistory>
+                        {currentSelectedExercise ?
+                            <div className="flex justify-center">
+                                <button
+                                    onClick={() => setDisplayWorkoutHistoryPage(true)}
+                                    className="justify-center rounded-md bg-main px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-main/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                                    Exercise history
+                                </button>
+                            </div>
+                            : <></>
+                        }
+                        <WorkoutShortHistory workoutList={workoutRecentHistory}
+                                             onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutShortHistory>
+                    </>
+                }
             </div>
         </main>
-    );
+    )
+        ;
 }

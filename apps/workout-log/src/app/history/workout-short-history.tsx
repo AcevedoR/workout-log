@@ -6,13 +6,16 @@ import {formatNarrowSmartly} from "../utils/date-utils";
 
 interface WorkoutHistoryProps {
     workoutList: WorkoutRow[],
-    onWorkoutDelete: (workoutId: string) => void,
+    onWorkoutDelete?: ((workoutId: string) => void),
 }
 
-export default function WorkoutHistory(props: WorkoutHistoryProps) {
-    const {workoutList, onWorkoutDelete = noop} = props;
+export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
+    const {workoutList, onWorkoutDelete} = props;
 
     const onDelete = async (workoutId: string) => {
+        if(!onWorkoutDelete){
+            throw new Error("this function should never be called when onWorkoutDelete is null")
+        }
         onWorkoutDelete(workoutId)
     };
 
@@ -43,9 +46,11 @@ export default function WorkoutHistory(props: WorkoutHistoryProps) {
                                         <p className="text-gray-500 text-sm">kg</p>
                                     </div>
                                     <div>
-                                        <RemoveWorkoutButton
-                                            onClick={() => onDelete(workout.id)}>
-                                        </RemoveWorkoutButton>
+                                        {onWorkoutDelete ?
+                                            <RemoveWorkoutButton
+                                                onClick={() => onDelete(workout.id)}>
+                                            </RemoveWorkoutButton> : <></>
+                                        }
                                     </div>
                                 </div>
                             </div>
