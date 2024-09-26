@@ -115,8 +115,9 @@ export default function LogForm(props: LogFormProps) {
                     name="weight"
                     id="weight"
                     value={weight}
+                    step="0.25"
                     onChange={(e) =>
-                        setWeight(Number.parseInt(e.target.value))
+                        setWeight(Number.parseFloat(e.target.value))
                     }
                     onFocus={selectAllInputOnFocus}
                     required
