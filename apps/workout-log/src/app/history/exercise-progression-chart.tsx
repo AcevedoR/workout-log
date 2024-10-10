@@ -3,7 +3,7 @@
 
 import React from "react";
 import {Workout} from "../workout";
-import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 
 export interface ExerciseProgressionChartProps {
     workoutList: Workout[]
@@ -56,80 +56,96 @@ export default function ExerciseProgressionChart(props: ExerciseProgressionChart
         .filter(([date, exerciseWeights]) => exerciseWeights && exerciseWeights.length >= 3);
     const usualTrainingWeightBySession: ExerciseWeight[] = weigthsForSessionWithMoreThan3Series
         .map(([date, exerciseWeights]) => {
-            if(!exerciseWeights){
+            if (!exerciseWeights) {
                 throw new Error("when calculating the max weight of a session, we should always have weights");
             }
             return {date: date, weight: getMostDoneWeight(exerciseWeights.map(x => x.weight))} as ExerciseWeight
         }).filter(exerciseWeight => exerciseWeight.weight != null);
 
-    console.log(usualTrainingWeightBySession);
     return (
         <div>
-            <div>
-                <h2>All data</h2>
-                {/*<ResponsiveContainer width="100%" height="100%"> TODO make work*/}
-                <LineChart
-                    width={500}
-                    height={300}
-                    data={exerciseWeights}
-                    margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="date"/>
-                    <YAxis/>
-                    <Tooltip/>
-                    <Legend/>
-                    <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{r: 8}}/>
-                </LineChart>
-                {/*</ResponsiveContainer>*/}
-            </div>
-            <div>
-                <h2>Max Weight by session</h2>
-                <LineChart
-                    width={500}
-                    height={300}
-                    data={maxWeightBySession}
-                    margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="date"/>
-                    <YAxis/>
-                    <Tooltip/>
-                    <Legend/>
-                    <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{r: 8}}/>
-                </LineChart>
-            </div>
-            <div>
-                <h2>Usual Weight by session</h2>
-                <LineChart
-                    width={500}
-                    height={300}
-                    data={usualTrainingWeightBySession}
-                    margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="date"/>
-                    <YAxis/>
-                    <Tooltip/>
-                    <Legend/>
-                    <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{r: 8}}/>
-                </LineChart>
-            </div>
+            {
+                !exerciseWeights || exerciseWeights.length == 0 ? <></>
+                    :
+                    <div className="h-60 mb-4">
+                        <h2>All data</h2>
+                        <ResponsiveContainer>
+                            <LineChart
+                                width={500}
+                                height={300}
+                                data={exerciseWeights}
+                                margin={{
+                                    top: 5,
+                                    right: 30,
+                                    left: 20,
+                                    bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3"/>
+                                <XAxis dataKey="date"/>
+                                <YAxis domain={["dataMin-20", 'dataMax']}/>
+                                <Tooltip/>
+                                <Legend/>
+                                <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{r: 8}}/>
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+            }
+            {!maxWeightBySession || maxWeightBySession.length == 0 ? <></>
+                :
+                <div className="h-60 mb-4">
+                    <h2>Max Weight by session</h2>
+                    <ResponsiveContainer>
+
+                        <LineChart
+                            width={500}
+                            height={300}
+                            data={maxWeightBySession}
+                            margin={{
+                                top: 5,
+                                right: 30,
+                                left: 20,
+                                bottom: 5,
+                            }}
+                        >
+                            <CartesianGrid strokeDasharray="3 3"/>
+                            <XAxis dataKey="date"/>
+                            <YAxis domain={["dataMin-20", 'dataMax']}/>
+                            <Tooltip/>
+                            <Legend/>
+                            <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{r: 8}}/>
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            }
+            {
+                !usualTrainingWeightBySession || usualTrainingWeightBySession.length == 0 ? <></>
+                    :
+                    <div className="h-60 mb-4">
+                        <h2>Usual Weight by session</h2>
+                        <ResponsiveContainer>
+
+                            <LineChart
+                                width={500}
+                                height={300}
+                                data={usualTrainingWeightBySession}
+                                margin={{
+                                    top: 5,
+                                    right: 30,
+                                    left: 20,
+                                    bottom: 5,
+                                }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3"/>
+                                <XAxis dataKey="date"/>
+                                <YAxis domain={["dataMin-20", 'dataMax']}/>
+                                <Tooltip/>
+                                <Legend/>
+                                <Line type="monotone" dataKey="weight" stroke="#8884d8" activeDot={{r: 8}}/>
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </div>
+            }
         </div>
     );
 
