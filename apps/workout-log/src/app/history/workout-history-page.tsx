@@ -33,12 +33,14 @@ export default function WorkoutHistoryPage(props: WorkoutHistoryPageProps) {
     return (
 
         <div className="mt-4">
-            <h1 className="text-center  text-2xl">Exercise: {exercice}</h1>
-            <button
-                onClick={() => setDisplayWorkoutHistoryPage(false)}
-                className="rounded-md bg-main px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-main/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                go back
-            </button>
+            <div className="flex flex-row justify-around">
+                <h1 className="  text-2xl">Exercise: {exercice}</h1>
+                <button
+                    onClick={() => setDisplayWorkoutHistoryPage(false)}
+                    className="rounded-md bg-main px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-main/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    go back
+                </button>
+            </div>
             {workoutRecentHistory.length > 0 ?
                 <div>
                     <ExerciseProgressionChart workoutList={workoutRecentHistory.map(x => x.value)}/>
