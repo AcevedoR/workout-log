@@ -12,6 +12,7 @@ import {
     where
 } from "@firebase/firestore";
 import {Workout, WorkoutRow} from "../workout";
+import {displayError} from "../utils/error-displayer";
 
 const WORKOUT_LOG_COLLECTION = "workout-log";
 
@@ -30,6 +31,7 @@ export async function add(userId: string, workout: Workout, db: Firestore) {
     } catch
         (e: any) {
         console.error('Unsuccessful', e)
+        displayError(e)
     }
 }
 
@@ -41,6 +43,7 @@ export async function deleteOne(workoutId: string, db: Firestore) {
     } catch
         (e: any) {
         console.error('Unsuccessful', e)
+        displayError(e)
     }
 }
 
@@ -73,7 +76,9 @@ export async function getMostRecents(db: Firestore, userId: string, lasts: numbe
         return res;
     } catch
         (e: any) {
+        console.info('dddddd' + e)
         console.error('Unsuccessful', e)
+        displayError(e)
     }
     return [];
 }
@@ -105,6 +110,7 @@ export async function findPersonalBest(userId: string, exercise: string, db: Fir
     } catch
         (e: any) {
         console.error('Unsuccessful', e)
+        displayError(e)
     }
     return undefined;
 }

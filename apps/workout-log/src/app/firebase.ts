@@ -24,8 +24,8 @@ export const db = getFirestore(firebase);
 
 if (isDevModeEnabled) {
     console.warn("running in Firebase emulated mode for auth");
-    connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-    connectFirestoreEmulator(db, '127.0.0.1', 9098);
+    connectAuthEmulator(auth, 'http://192.168.243.20:9099');
+    connectFirestoreEmulator(db, '192.168.243.20', 9098);
 }
 
 export const getWorkoutLogAuth = () => {

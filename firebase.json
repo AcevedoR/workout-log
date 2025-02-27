@@ -1,17 +1,20 @@
 {
   "emulators": {
     "functions": {
-      "port": 5001
+      "port": 5001,
+      "host": "192.168.243.20"
     },
     "firestore": {
-      "port": 9098
+      "port": 9098,
+      "host": "192.168.243.20"
     },
     "ui": {
       "enabled": true
     },
     "singleProjectMode": true,
     "auth": {
-      "port": 9099
+      "port": 9099,
+      "host": "192.168.243.20"
     }
   },
   "functions": [

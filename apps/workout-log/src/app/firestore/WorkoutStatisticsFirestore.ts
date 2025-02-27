@@ -2,6 +2,7 @@ import {collection, doc, Firestore, getDoc, limit, query, where} from "@firebase
 import {UsualLift} from "../model/usual-lift";
 import {ExerciseStatistics} from "./exercise-statistics";
 import {UserID} from "../UserID";
+import {displayError} from "../utils/error-displayer";
 
 const EXERCISE_STATISTICS_COLLECTION = "exercise-statistics";
 
@@ -25,6 +26,7 @@ export async function findUsualLiftFromDb(userId: UserID, exercise: string, db: 
     } catch
         (e: any) {
         console.error('Unsuccessful', e)
+        displayError(e)
     }
     return undefined;
 }
