@@ -4,8 +4,8 @@ import React from "react";
 import WorkoutShortHistory from "./workout-short-history";
 import {WorkoutRow} from "../workout";
 
-function row(id: string, date: Date): WorkoutRow {
-    return {id, value: {exercise: "Squat", reps: 5, weight: 80, date: date.valueOf()}};
+function row(id: string, date: Date, sessionId?: string): WorkoutRow {
+    return {id, value: {exercise: "Squat", reps: 5, weight: 80, date: date.valueOf(), sessionId}};
 }
 
 afterEach(() => cleanup());
@@ -25,6 +25,18 @@ describe('WorkoutShortHistory session grouping', () => {
 
         expect(container.querySelectorAll('#workout-session')).toHaveLength(2);
         expect(container.querySelectorAll('#workout-history-entry')).toHaveLength(4);
+    })
+
+    it('renders one block per persisted sessionId, even for close-in-time logs', () => {
+        const workouts = [
+            row("2", new Date("2024-07-13T10:20:00"), "session-B"),
+            row("1", new Date("2024-07-13T10:00:00"), "session-A"),
+        ];
+
+        const {container} = render(<WorkoutShortHistory workoutList={workouts}/>);
+
+        expect(container.querySelectorAll('#workout-session')).toHaveLength(2);
+        expect(container.querySelectorAll('#workout-history-entry')).toHaveLength(2);
     })
 
     it('keeps a single close-in-time visit in one session block', () => {

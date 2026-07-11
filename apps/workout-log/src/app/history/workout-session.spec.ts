@@ -1,8 +1,8 @@
 import {describe, expect, it} from 'vitest'
 import {WorkoutRow} from "../workout";
-import {groupWorkoutsIntoSessions, SESSION_MAX_GAP_IN_MS} from "./workout-session";
+import {groupWorkoutsIntoSessions, resolveSessionId, SESSION_MAX_GAP_IN_MS} from "./workout-session";
 
-function row(id: string, date: Date, overrides?: { exercise?: string, reps?: number, weight?: number }): WorkoutRow {
+function row(id: string, date: Date, overrides?: { exercise?: string, reps?: number, weight?: number, sessionId?: string }): WorkoutRow {
     return {
         id,
         value: {
@@ -10,9 +10,50 @@ function row(id: string, date: Date, overrides?: { exercise?: string, reps?: num
             reps: overrides?.reps ?? 5,
             weight: overrides?.weight ?? 80,
             date: date.valueOf(),
+            sessionId: overrides?.sessionId,
         }
     };
 }
+
+describe('resolveSessionId', () => {
+    it('starts a new session when there is no previous workout', () => {
+        const id = resolveSessionId(new Date("2024-07-13T10:00:00").valueOf(), undefined, "new-id");
+
+        expect(id).toEqual("new-id");
+    })
+
+    it('reuses the previous session when the new log is close enough in time', () => {
+        const mostRecent = row("1", new Date("2024-07-13T10:00:00"), {sessionId: "session-A"});
+
+        const id = resolveSessionId(new Date("2024-07-13T10:20:00").valueOf(), mostRecent, "new-id");
+
+        expect(id).toEqual("session-A");
+    })
+
+    it('starts a new session when the gap to the previous log exceeds the threshold', () => {
+        const mostRecent = row("1", new Date("2024-07-12T10:00:00"), {sessionId: "session-A"});
+
+        const id = resolveSessionId(new Date("2024-07-13T10:00:00").valueOf(), mostRecent, "new-id");
+
+        expect(id).toEqual("new-id");
+    })
+
+    it('reuses exactly at the threshold and starts fresh one millisecond past it', () => {
+        const base = new Date("2024-07-13T10:00:00").valueOf();
+        const mostRecent = row("1", new Date(base), {sessionId: "session-A"});
+
+        expect(resolveSessionId(base + SESSION_MAX_GAP_IN_MS, mostRecent, "new-id")).toEqual("session-A");
+        expect(resolveSessionId(base + SESSION_MAX_GAP_IN_MS + 1, mostRecent, "new-id")).toEqual("new-id");
+    })
+
+    it('starts a new session when the previous log predates sessions (no sessionId)', () => {
+        const legacy = row("1", new Date("2024-07-13T10:00:00"));
+
+        const id = resolveSessionId(new Date("2024-07-13T10:20:00").valueOf(), legacy, "new-id");
+
+        expect(id).toEqual("new-id");
+    })
+})
 
 describe('groupWorkoutsIntoSessions', () => {
     it('returns no session for an empty list', () => {
@@ -20,22 +61,23 @@ describe('groupWorkoutsIntoSessions', () => {
     })
 
     it('groups a single workout into one session', () => {
-        const only = row("1", new Date("2024-07-13T10:00:00"));
+        const only = row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"});
 
         const sessions = groupWorkoutsIntoSessions([only]);
 
         expect(sessions).toHaveLength(1);
         expect(sessions[0].workouts).toEqual([only]);
+        expect(sessions[0].sessionId).toEqual("A");
         expect(sessions[0].startDate).toEqual(only.value.date);
         expect(sessions[0].endDate).toEqual(only.value.date);
     })
 
-    it('keeps workouts close in time in the same session', () => {
+    it('groups consecutive workouts that share a persisted sessionId', () => {
         // input is sorted most-recent-first, like getMostRecents returns it
         const workouts = [
-            row("3", new Date("2024-07-13T10:40:00")),
-            row("2", new Date("2024-07-13T10:20:00")),
-            row("1", new Date("2024-07-13T10:00:00")),
+            row("3", new Date("2024-07-13T10:40:00"), {sessionId: "A"}),
+            row("2", new Date("2024-07-13T10:20:00"), {sessionId: "A"}),
+            row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"}),
         ];
 
         const sessions = groupWorkoutsIntoSessions(workouts);
@@ -46,43 +88,43 @@ describe('groupWorkoutsIntoSessions', () => {
         expect(sessions[0].endDate).toEqual(new Date("2024-07-13T10:40:00").valueOf());
     })
 
-    it('splits into separate sessions when the gap is larger than the threshold', () => {
-        const todaySecond = row("4", new Date("2024-07-13T18:20:00"));
-        const todayFirst = row("3", new Date("2024-07-13T18:00:00"));
-        const yesterdaySecond = row("2", new Date("2024-07-12T09:20:00"));
-        const yesterdayFirst = row("1", new Date("2024-07-12T09:00:00"));
+    it('splits into separate sessions when the persisted sessionId changes', () => {
+        const todaySecond = row("4", new Date("2024-07-13T18:20:00"), {sessionId: "B"});
+        const todayFirst = row("3", new Date("2024-07-13T18:00:00"), {sessionId: "B"});
+        const yesterdaySecond = row("2", new Date("2024-07-12T09:20:00"), {sessionId: "A"});
+        const yesterdayFirst = row("1", new Date("2024-07-12T09:00:00"), {sessionId: "A"});
 
         const sessions = groupWorkoutsIntoSessions([todaySecond, todayFirst, yesterdaySecond, yesterdayFirst]);
 
         expect(sessions).toHaveLength(2);
         expect(sessions[0].workouts).toEqual([todaySecond, todayFirst]);
+        expect(sessions[0].sessionId).toEqual("B");
         expect(sessions[1].workouts).toEqual([yesterdaySecond, yesterdayFirst]);
+        expect(sessions[1].sessionId).toEqual("A");
     })
 
-    it('starts a new session exactly when the gap exceeds the threshold', () => {
-        const base = new Date("2024-07-13T10:00:00").valueOf();
-        const within = row("2", new Date(base + SESSION_MAX_GAP_IN_MS));
-        const beyond = row("3", new Date(base + SESSION_MAX_GAP_IN_MS + 1));
-        const first = row("1", new Date(base));
+    it('keeps two same-day sessions apart even when their logs are close in time', () => {
+        // Persisted ids are authoritative: these would merge under pure time-grouping, but must not.
+        const secondSession = row("2", new Date("2024-07-13T10:20:00"), {sessionId: "B"});
+        const firstSession = row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"});
 
-        // ordered most-recent-first
-        const atThreshold = groupWorkoutsIntoSessions([within, first]);
-        expect(atThreshold).toHaveLength(1);
+        const sessions = groupWorkoutsIntoSessions([secondSession, firstSession]);
 
-        const overThreshold = groupWorkoutsIntoSessions([beyond, first]);
-        expect(overThreshold).toHaveLength(2);
+        expect(sessions).toHaveLength(2);
     })
 
-    it('honours a custom max gap', () => {
+    it('falls back to time proximity for legacy logs without a sessionId', () => {
         const workouts = [
-            row("2", new Date("2024-07-13T10:30:00")),
-            row("1", new Date("2024-07-13T10:00:00")),
+            row("4", new Date("2024-07-13T18:20:00")),
+            row("3", new Date("2024-07-13T18:00:00")),
+            row("2", new Date("2024-07-12T09:20:00")),
+            row("1", new Date("2024-07-12T09:00:00")),
         ];
 
-        const oneHourGap = groupWorkoutsIntoSessions(workouts, 60 * 60 * 1000);
-        expect(oneHourGap).toHaveLength(1);
+        const sessions = groupWorkoutsIntoSessions(workouts);
 
-        const tenMinuteGap = groupWorkoutsIntoSessions(workouts, 10 * 60 * 1000);
-        expect(tenMinuteGap).toHaveLength(2);
+        expect(sessions).toHaveLength(2);
+        expect(sessions[0].workouts).toEqual([workouts[0], workouts[1]]);
+        expect(sessions[1].workouts).toEqual([workouts[2], workouts[3]]);
     })
 })

@@ -5,15 +5,42 @@ import {WorkoutRow} from "../workout";
 export const SESSION_MAX_GAP_IN_MS = 3 * 60 * 60 * 1000; // 3 hours
 
 export interface WorkoutSession {
+    sessionId?: string,
     startDate: number,
     endDate: number,
     workouts: WorkoutRow[],
 }
 
 /**
- * Groups workout logs into sessions purely from their timestamps — no session id is ever stored.
- * Consecutive logs are attached to the same session as long as the gap between them stays within
- * `maxGapInMs`; a larger gap starts a new session.
+ * Generates a brand-new session id. Kept separate from `resolveSessionId` so the decision logic
+ * stays pure and testable while the randomness lives here.
+ */
+export function generateSessionId(): string {
+    return crypto.randomUUID();
+}
+
+/**
+ * Decides which session a newly logged workout belongs to, so the id can be persisted on the doc.
+ * Reuses the most recent workout's session when the new log falls within `maxGapInMs` of it;
+ * otherwise returns `newSessionId` to start a fresh session. Logs predating this feature carry no
+ * `sessionId`, so they can never be extended — a new session starts instead.
+ */
+export function resolveSessionId(
+    newWorkoutDate: number,
+    mostRecentWorkout: WorkoutRow | undefined,
+    newSessionId: string,
+    maxGapInMs: number = SESSION_MAX_GAP_IN_MS,
+): string {
+    if (mostRecentWorkout?.value.sessionId
+        && Math.abs(newWorkoutDate - mostRecentWorkout.value.date) <= maxGapInMs) {
+        return mostRecentWorkout.value.sessionId;
+    }
+    return newSessionId;
+}
+
+/**
+ * Groups workout logs into sessions for display. When both neighbours carry a persisted `sessionId`
+ * that id is authoritative; for legacy logs without one it falls back to time proximity.
  *
  * `workouts` is expected to be sorted most-recent-first (as returned by `getMostRecents`); the
  * returned sessions and the workouts inside them preserve that order.
@@ -27,8 +54,7 @@ export function groupWorkoutsIntoSessions(workouts: WorkoutRow[], maxGapInMs: nu
     let current: WorkoutRow[] = [workouts[0]];
 
     for (let i = 1; i < workouts.length; i++) {
-        const gap = Math.abs(workouts[i - 1].value.date - workouts[i].value.date);
-        if (gap <= maxGapInMs) {
+        if (belongToSameSession(workouts[i - 1], workouts[i], maxGapInMs)) {
             current.push(workouts[i]);
         } else {
             sessions.push(toSession(current));
@@ -40,9 +66,17 @@ export function groupWorkoutsIntoSessions(workouts: WorkoutRow[], maxGapInMs: nu
     return sessions;
 }
 
+function belongToSameSession(a: WorkoutRow, b: WorkoutRow, maxGapInMs: number): boolean {
+    if (a.value.sessionId && b.value.sessionId) {
+        return a.value.sessionId === b.value.sessionId;
+    }
+    return Math.abs(a.value.date - b.value.date) <= maxGapInMs;
+}
+
 function toSession(workouts: WorkoutRow[]): WorkoutSession {
     const dates = workouts.map(w => w.value.date);
     return {
+        sessionId: workouts[0].value.sessionId,
         startDate: Math.min(...dates),
         endDate: Math.max(...dates),
         workouts,
