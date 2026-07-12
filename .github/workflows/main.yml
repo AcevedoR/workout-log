@@ -30,6 +30,11 @@ jobs:
       with:
         node-version: 20.x
         cache: 'npm'
+    - name: Use Java 21 (required by firebase-tools emulators)
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '21'
     - run: npm ci
     - uses: nrwl/nx-set-shas@v4
     - run: npx nx affected -t test build

@@ -12,11 +12,15 @@ import {
     where
 } from "@firebase/firestore";
 import {Workout, WorkoutRow} from "../workout";
+import {generateSessionId, resolveSessionId} from "../history/workout-session";
 
 const WORKOUT_LOG_COLLECTION = "workout-log";
 
 export async function add(userId: string, workout: Workout, db: Firestore) {
     try {
+        const [mostRecent] = await getMostRecents(db, userId, 1);
+        const sessionId = resolveSessionId(workout.date, mostRecent, generateSessionId());
+
         await addDoc(
             collection(db, WORKOUT_LOG_COLLECTION),
             {
@@ -24,6 +28,7 @@ export async function add(userId: string, workout: Workout, db: Firestore) {
                 date: workout.date,
                 reps: workout.reps,
                 exercise: workout.exercise,
+                sessionId: sessionId,
                 userId: userId
             }
         );
