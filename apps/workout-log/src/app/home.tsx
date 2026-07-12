@@ -83,7 +83,7 @@ export default function Home(props: HomeProps) {
 
     const subtitle = <p className="text-xs">{appShortDescription}</p>
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-10 pt-6">
+        <main className="flex min-h-screen flex-col items-center justify-between p-5 pt-4 sm:p-10 sm:pt-6">
             <div>
 
 
@@ -128,19 +128,11 @@ export default function Home(props: HomeProps) {
                                     ref={clockWatchChildRef}></ClockWatch>
                         <div>
                             <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
-                                     lastWorkoutInput={getLastWorkoutInputInLocalStorage()}>
+                                     lastWorkoutInput={getLastWorkoutInputInLocalStorage()}
+                                     canShowExerciseHistory={!!currentSelectedExercise}
+                                     onShowExerciseHistory={() => setDisplayWorkoutHistoryPage(true)}>
                             </LogForm>
                         </div>
-                        {currentSelectedExercise ?
-                            <div className="flex justify-center">
-                                <button
-                                    onClick={() => setDisplayWorkoutHistoryPage(true)}
-                                    className="justify-center rounded-md bg-main px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-main/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                                    Exercise history
-                                </button>
-                            </div>
-                            : <></>
-                        }
                         <WorkoutShortHistory workoutList={workoutRecentHistory}
                                              onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutShortHistory>
                     </>
