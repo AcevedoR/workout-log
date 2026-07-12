@@ -3,6 +3,7 @@ import {WorkoutRow} from "../workout";
 import {RemoveWorkoutButton} from "./remove-workout-button";
 import {formatNarrowSmartly} from "../utils/date-utils";
 import {groupWorkoutsIntoSessions} from "./workout-session";
+import {classifySessionSets} from "./set-intensity";
 
 interface WorkoutHistoryProps {
     workoutList: WorkoutRow[],
@@ -26,7 +27,9 @@ export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
             <h3 className="text-center">last workouts</h3>
             <div id="workout-history">
                 {
-                    sessions.map((session) => (
+                    sessions.map((session) => {
+                    const setIntensity = classifySessionSets(session.workouts);
+                    return (
                         <section id="workout-session" key={session.startDate} className="mt-4">
                             <h4 className="text-xs uppercase tracking-wide text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-1">
                                 {formatNarrowSmartly(session.endDate)}
@@ -35,7 +38,9 @@ export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
                             <ul role="list" className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {
                                     session.workouts.map((workout) => (
-                                        <li id="workout-history-entry" key={workout.id} className="py-3 sm:py-4">
+                                        <li id="workout-history-entry" key={workout.id}
+                                            className={`py-3 sm:py-4 transition-opacity ${setIntensity.get(workout.id) === "warmup" ? "opacity-40" : ""}`}
+                                            title={setIntensity.get(workout.id) === "warmup" ? "warm-up set" : undefined}>
                                             <div className="flex flex-row space-x-4 justify-between">
 
                                                 <div className="text-gray-500">
@@ -69,7 +74,8 @@ export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
                                 }
                             </ul>
                         </section>
-                    ))
+                    );
+                    })
                 }
             </div>
         </div>
