@@ -21,17 +21,20 @@ export async function add(userId: string, workout: Workout, db: Firestore) {
         const [mostRecent] = await getMostRecents(db, userId, 1);
         const sessionId = resolveSessionId(workout.date, mostRecent, generateSessionId());
 
-        await addDoc(
-            collection(db, WORKOUT_LOG_COLLECTION),
-            {
-                weight: workout.weight,
-                date: workout.date,
-                reps: workout.reps,
-                exercise: workout.exercise,
-                sessionId: sessionId,
-                userId: userId
-            }
-        );
+        const workoutDoc: Record<string, any> = {
+            weight: workout.weight,
+            date: workout.date,
+            reps: workout.reps,
+            exercise: workout.exercise,
+            sessionId: sessionId,
+            userId: userId
+        };
+        // Firestore rejects `undefined` fields, so only include RPE when it was actually set.
+        if (workout.rpe !== undefined) {
+            workoutDoc.rpe = workout.rpe;
+        }
+
+        await addDoc(collection(db, WORKOUT_LOG_COLLECTION), workoutDoc);
     } catch
         (e: any) {
         console.error('Unsuccessful', e)

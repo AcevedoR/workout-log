@@ -60,6 +60,13 @@ export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
                                                         {workout.value.weight}
                                                         <p className="text-gray-500 text-sm">kg</p>
                                                     </div>
+                                                    {workout.value.rpe !== undefined ?
+                                                        <div className="inline-flex items-center text-sm text-gray-400"
+                                                             title="Rate of Perceived Exertion">
+                                                            @{workout.value.rpe}
+                                                        </div>
+                                                        : <></>
+                                                    }
                                                     <div>
                                                         {onWorkoutDelete ?
                                                             <RemoveWorkoutButton
