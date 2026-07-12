@@ -1,22 +1,33 @@
 import React, {FocusEvent, useState} from "react";
 import {Workout} from "../workout";
 import {noop} from "../noop";
-import {RPE_MAX, RPE_MIN, sanitizeRpe} from "../model/rpe";
+import {sanitizeRpe} from "../model/rpe";
+import RpeSelector from "./rpe-selector";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faClockRotateLeft} from "@fortawesome/free-solid-svg-icons";
 
 interface LogFormProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
     onExerciseSelected?: (e: { exercise: string }) => void;
     lastWorkoutInput: Workout | undefined;
+    onShowExerciseHistory?: () => void;
+    canShowExerciseHistory?: boolean;
 }
 
 export default function LogForm(props: LogFormProps) {
-    const {onWorkoutLog = noop, onExerciseSelected = noop, lastWorkoutInput} = props;
+    const {
+        onWorkoutLog = noop,
+        onExerciseSelected = noop,
+        lastWorkoutInput,
+        onShowExerciseHistory = noop,
+        canShowExerciseHistory = false,
+    } = props;
 
     const [exercise, setExercise] = useState(lastWorkoutInput ? lastWorkoutInput.exercise : "deadlift");
     const [reps, setReps] = useState(lastWorkoutInput ? lastWorkoutInput.reps : 10);
     const [weight, setWeight] = useState(lastWorkoutInput ? lastWorkoutInput.weight : 80);
     // RPE is optional and set-specific, so it always starts blank rather than carrying over.
-    const [rpe, setRpe] = useState<string>("");
+    const [rpe, setRpe] = useState<number | undefined>(undefined);
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
@@ -72,7 +83,7 @@ export default function LogForm(props: LogFormProps) {
 
     return (
         <form
-            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-6  gap-x-6 gap-y-8 sm:grid-cols-6'
+            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-4 gap-x-6 gap-y-3 sm:grid-cols-6'
             onSubmit={(e) => onSubmit(e)}
         >
             {error && <div style={{color: 'red'}}>{error}</div>}
@@ -127,26 +138,13 @@ export default function LogForm(props: LogFormProps) {
                     required
                 />
             </div>
-            <div className={"form-element"}>
-                <label htmlFor="rpe" className="block text-sm font-medium leading-6">
+            <div className="form-element w-full">
+                <label htmlFor="rpe-selector" className="block text-sm font-medium leading-6">
                     RPE <span className="text-xs font-normal text-gray-400">(optional)</span>
                 </label>
-                <input
-                    type="number"
-                    name="rpe"
-                    id="rpe"
-                    value={rpe}
-                    min={RPE_MIN}
-                    max={RPE_MAX}
-                    step={1}
-                    placeholder={`${RPE_MIN}-${RPE_MAX}`}
-                    onChange={(e) =>
-                        setRpe(e.target.value)
-                    }
-                    onFocus={selectAllInputOnFocus}
-                />
+                <RpeSelector value={rpe} onChange={setRpe}/>
             </div>
-            <div className={"form-element content-center"}>
+            <div className="form-element content-center flex flex-row items-center gap-3">
                 <button
                     className="rounded-md bg-main px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-main/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     type="submit"
@@ -154,6 +152,17 @@ export default function LogForm(props: LogFormProps) {
                     disabled={isLoading}>
                     {isLoading ? 'Loading...' : 'Submit'}
                 </button>
+                {canShowExerciseHistory ?
+                    <button
+                        type="button"
+                        onClick={onShowExerciseHistory}
+                        title="Exercise history"
+                        aria-label="Exercise history"
+                        className="rounded-md border border-main px-3 py-2 text-sm font-semibold text-main shadow-sm hover:bg-main/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <FontAwesomeIcon icon={faClockRotateLeft}/>
+                    </button>
+                    : <></>
+                }
             </div>
         </form>
     );

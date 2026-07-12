@@ -4,6 +4,7 @@ import {RemoveWorkoutButton} from "./remove-workout-button";
 import {formatNarrowSmartly} from "../utils/date-utils";
 import {groupWorkoutsIntoSessions} from "./workout-session";
 import {classifySessionSets} from "./set-intensity";
+import {rpeColor} from "../model/rpe";
 
 interface WorkoutHistoryProps {
     workoutList: WorkoutRow[],
@@ -61,9 +62,10 @@ export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
                                                         <p className="text-gray-500 text-sm">kg</p>
                                                     </div>
                                                     {workout.value.rpe !== undefined ?
-                                                        <div className="inline-flex items-center text-sm text-gray-400"
+                                                        <div className="inline-flex items-center justify-center rounded px-1.5 text-xs font-semibold text-black/70"
+                                                             style={{backgroundColor: rpeColor(workout.value.rpe)}}
                                                              title="Rate of Perceived Exertion">
-                                                            @{workout.value.rpe}
+                                                            {workout.value.rpe}
                                                         </div>
                                                         : <></>
                                                     }
