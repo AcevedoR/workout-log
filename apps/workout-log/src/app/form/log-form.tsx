@@ -1,6 +1,7 @@
 import React, {FocusEvent, useState} from "react";
 import {Workout} from "../workout";
 import {noop} from "../noop";
+import {RPE_MAX, RPE_MIN, sanitizeRpe} from "../model/rpe";
 
 interface LogFormProps {
     onWorkoutLog?: (e: { workout: Workout }) => void;
@@ -14,6 +15,8 @@ export default function LogForm(props: LogFormProps) {
     const [exercise, setExercise] = useState(lastWorkoutInput ? lastWorkoutInput.exercise : "deadlift");
     const [reps, setReps] = useState(lastWorkoutInput ? lastWorkoutInput.reps : 10);
     const [weight, setWeight] = useState(lastWorkoutInput ? lastWorkoutInput.weight : 80);
+    // RPE is optional and set-specific, so it always starts blank rather than carrying over.
+    const [rpe, setRpe] = useState<string>("");
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [error, setError] = useState<string | null>(null)
@@ -45,7 +48,8 @@ export default function LogForm(props: LogFormProps) {
                     exercise,
                     reps,
                     weight,
-                    date: Date.now()
+                    date: Date.now(),
+                    rpe: sanitizeRpe(rpe)
                 }
             });
 
@@ -121,6 +125,25 @@ export default function LogForm(props: LogFormProps) {
                     }
                     onFocus={selectAllInputOnFocus}
                     required
+                />
+            </div>
+            <div className={"form-element"}>
+                <label htmlFor="rpe" className="block text-sm font-medium leading-6">
+                    RPE <span className="text-xs font-normal text-gray-400">(optional)</span>
+                </label>
+                <input
+                    type="number"
+                    name="rpe"
+                    id="rpe"
+                    value={rpe}
+                    min={RPE_MIN}
+                    max={RPE_MAX}
+                    step={1}
+                    placeholder={`${RPE_MIN}-${RPE_MAX}`}
+                    onChange={(e) =>
+                        setRpe(e.target.value)
+                    }
+                    onFocus={selectAllInputOnFocus}
                 />
             </div>
             <div className={"form-element content-center"}>
