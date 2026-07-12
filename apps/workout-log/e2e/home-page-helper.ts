@@ -32,7 +32,8 @@ export class HomePageHelper {
     }
 
     async submitWorkoutLog(workoutInput: { exercise: string, reps: number, weight: number }) {
-        await this.page.getByLabel('exercise').fill(workoutInput.exercise);
+        // target by id: getByLabel('exercise') also matches the "Exercise history" button's aria-label
+        await this.page.locator('#exercise').fill(workoutInput.exercise);
         await this.page.getByLabel('reps').fill(workoutInput.reps.toString());
         await this.page.getByLabel('weight').fill(workoutInput.weight.toString());
         await this.page.locator("[type=submit]").click();
