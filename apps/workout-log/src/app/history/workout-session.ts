@@ -40,8 +40,14 @@ export function resolveSessionId(
 }
 
 /**
- * Groups workout logs into sessions for display. When both neighbours carry a persisted `sessionId`
- * that id is authoritative; for legacy logs without one it falls back to time proximity.
+ * Groups workout logs into sessions for display. Two neighbours belong to the same session when they
+ * share a persisted `sessionId` OR they were logged within `maxGapInMs` of each other.
+ *
+ * The time-proximity fallback is not just for legacy logs: `resolveSessionId` only ever mints a *new*
+ * id when there was no readable previous set (a best-effort Firestore read can transiently return
+ * nothing) or when the real gap exceeds `maxGapInMs`. So two neighbours that carry *different* ids yet
+ * sit within the gap can only be a spuriously-split single session — merging them by time heals that.
+ * Genuinely separate gym visits are always more than `maxGapInMs` apart, so they still split.
  *
  * `workouts` is expected to be sorted most-recent-first (as returned by `getMostRecents`); the
  * returned sessions and the workouts inside them preserve that order.
@@ -84,8 +90,8 @@ export function countSessionsThisWeek(workouts: WorkoutRow[], now: Date = new Da
 }
 
 function belongToSameSession(a: WorkoutRow, b: WorkoutRow, maxGapInMs: number): boolean {
-    if (a.value.sessionId && b.value.sessionId) {
-        return a.value.sessionId === b.value.sessionId;
+    if (a.value.sessionId && b.value.sessionId && a.value.sessionId === b.value.sessionId) {
+        return true;
     }
     return Math.abs(a.value.date - b.value.date) <= maxGapInMs;
 }

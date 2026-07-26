@@ -14,6 +14,23 @@ export function formatNarrowSmartly(timestampToFormat: number, overrideDefaultLo
 }
 
 /**
+ * Full, human-readable date + time for a log — shown when the user taps a log's short date.
+ * `formatNarrowSmartly` deliberately hides most of this to stay compact, so this is the "see everything" view.
+ */
+export function formatFullDateTime(timestamp: number, overrideDefaultLocale?: Intl.Locale): string {
+    const locale = overrideDefaultLocale ? overrideDefaultLocale : 'default';
+    return new Date(timestamp).toLocaleString(locale, {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+    });
+}
+
+/**
  * Returns the start (00:00:00.000, local time) of the ISO week — i.e. the Monday — containing `date`.
  * Used to bound "this week" as Monday→Sunday for the weekly session counter.
  */

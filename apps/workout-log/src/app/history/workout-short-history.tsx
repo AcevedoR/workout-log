@@ -1,10 +1,23 @@
 import React from "react";
+import {Bounce, toast} from "react-toastify";
 import {WorkoutRow} from "../workout";
 import {RemoveWorkoutButton} from "./remove-workout-button";
-import {formatNarrowSmartly} from "../utils/date-utils";
+import {formatFullDateTime, formatNarrowSmartly} from "../utils/date-utils";
 import {groupWorkoutsIntoSessions} from "./workout-session";
 import {classifySessionSets} from "./set-intensity";
 import {rpeColor} from "../model/rpe";
+
+// The list shows a deliberately compact date; tapping it surfaces the exact date & time.
+function showFullDateTime(timestamp: number): void {
+    toast.info(formatFullDateTime(timestamp), {
+        position: "bottom-center",
+        autoClose: 5000,
+        closeOnClick: true,
+        pauseOnHover: true,
+        theme: "light",
+        transition: Bounce,
+    });
+}
 
 interface WorkoutHistoryProps {
     workoutList: WorkoutRow[],
@@ -44,9 +57,13 @@ export default function WorkoutShortHistory(props: WorkoutHistoryProps) {
                                             title={setIntensity.get(workout.id) === "warmup" ? "warm-up set" : undefined}>
                                             <div className="flex flex-row space-x-4 justify-between">
 
-                                                <div className="text-gray-500">
+                                                <button
+                                                    type="button"
+                                                    className="text-gray-500 hover:underline focus:underline cursor-pointer"
+                                                    title="Show full date & time"
+                                                    onClick={() => showFullDateTime(workout.value.date)}>
                                                     {formatNarrowSmartly(workout.value.date)}
-                                                </div>
+                                                </button>
                                                 <div className="inline-flex min-w-0">
                                                     {workout.value.exercise}
                                                 </div>

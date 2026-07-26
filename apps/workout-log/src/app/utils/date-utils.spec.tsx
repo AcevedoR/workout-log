@@ -1,4 +1,4 @@
-import {formatNarrowSmartly, getDateDiffInSecondsAndMinutes, startOfIsoWeek} from "./date-utils";
+import {formatFullDateTime, formatNarrowSmartly, getDateDiffInSecondsAndMinutes, startOfIsoWeek} from "./date-utils";
 import {describe, expect, it} from 'vitest'
 
 const US_LOCALE = new Intl.Locale('en-US');
@@ -55,6 +55,20 @@ describe('date utils tests', () => {
         expect(res).toEqual('03:00');
     })
 })
+describe('formatFullDateTime', () => {
+    it('includes weekday, full date and time (FR, 24h)', () => {
+        const res = formatFullDateTime(new Date("2024-07-13T14:05:09").valueOf(), FR_LOCALE);
+
+        expect(res).toEqual('sam. 13 juil. 2024, 14:05:09');
+    })
+
+    it('includes weekday, full date and time (US, 12h)', () => {
+        const res = formatFullDateTime(new Date("2024-07-13T14:05:09").valueOf(), US_LOCALE);
+
+        expect(res).toEqual('Sat, Jul 13, 2024, 02:05:09 PM');
+    })
+})
+
 describe('startOfIsoWeek', () => {
     it('returns the Monday for a mid-week day', () => {
         // 2024-07-10 is a Wednesday; its ISO week starts Monday 2024-07-08.

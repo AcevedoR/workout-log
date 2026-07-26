@@ -103,14 +103,73 @@ describe('groupWorkoutsIntoSessions', () => {
         expect(sessions[1].sessionId).toEqual("A");
     })
 
-    it('keeps two same-day sessions apart even when their logs are close in time', () => {
-        // Persisted ids are authoritative: these would merge under pure time-grouping, but must not.
-        const secondSession = row("2", new Date("2024-07-13T10:20:00"), {sessionId: "B"});
-        const firstSession = row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"});
+    it('heals a spurious split: neighbours with different ids but within the gap merge', () => {
+        // resolveSessionId only mints a new id after a >gap pause or a failed read of the previous
+        // set, so two sets 20 min apart carrying different ids can only be a single session that was
+        // wrongly split at write time. Time proximity must win here.
+        const secondSet = row("2", new Date("2024-07-13T10:20:00"), {sessionId: "B"});
+        const firstSet = row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"});
 
-        const sessions = groupWorkoutsIntoSessions([secondSession, firstSession]);
+        const sessions = groupWorkoutsIntoSessions([secondSet, firstSet]);
 
-        expect(sessions).toHaveLength(2);
+        expect(sessions).toHaveLength(1);
+        expect(sessions[0].workouts).toEqual([secondSet, firstSet]);
+    })
+
+    it('heals the real prod split (a 31-min bench session broken at a 7.5-min gap)', () => {
+        // Exact shape of the reported bug: one continuous session whose sets carry two different ids
+        // because a mid-session write got a fresh id. Every consecutive gap is a few minutes.
+        const sessionA = "64649f8d-a016-415c-b41f-1cd62f7bd395";
+        const sessionB = "7ded470d-ba50-4ad0-8316-21943d260b85";
+        const workouts = [
+            row("QYFTun", new Date(1784743631556), {sessionId: sessionB}),
+            row("qx1K9h", new Date(1784743356196), {sessionId: sessionB}),
+            row("oI13iu", new Date(1784743188424), {sessionId: sessionB}),
+            row("rzLgSq", new Date(1784742954833), {sessionId: sessionB}),
+            row("oCr4uV", new Date(1784742507438), {sessionId: sessionA}),
+            row("tDUX72", new Date(1784742156704), {sessionId: sessionA}),
+            row("KbvXzC", new Date(1784741776900), {sessionId: sessionA}),
+        ];
+
+        const sessions = groupWorkoutsIntoSessions(workouts);
+
+        expect(sessions).toHaveLength(1);
+        expect(sessions[0].workouts).toHaveLength(7);
+    })
+
+    it('heals a session fragmented into three different ids when every gap stays within the window', () => {
+        // A read can fail more than once in a session, minting a fresh id each time. As long as each
+        // consecutive gap is within the window the whole thing must still collapse to one session.
+        const workouts = [
+            row("5", new Date("2024-07-13T10:40:00"), {sessionId: "C"}),
+            row("4", new Date("2024-07-13T10:30:00"), {sessionId: "C"}),
+            row("3", new Date("2024-07-13T10:20:00"), {sessionId: "B"}),
+            row("2", new Date("2024-07-13T10:10:00"), {sessionId: "B"}),
+            row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"}),
+        ];
+
+        const sessions = groupWorkoutsIntoSessions(workouts);
+
+        expect(sessions).toHaveLength(1);
+        expect(sessions[0].workouts).toHaveLength(5);
+    })
+
+    it('merges different ids exactly at the gap boundary but splits one millisecond past it', () => {
+        // Guards the healing rule from over-reaching: two genuinely separate visits are always more
+        // than the gap apart, so the boundary is exactly where a spurious split stops being plausible.
+        const base = new Date("2024-07-13T10:00:00").valueOf();
+
+        const atBoundary = groupWorkoutsIntoSessions([
+            row("2", new Date(base + SESSION_MAX_GAP_IN_MS), {sessionId: "B"}),
+            row("1", new Date(base), {sessionId: "A"}),
+        ]);
+        expect(atBoundary).toHaveLength(1);
+
+        const pastBoundary = groupWorkoutsIntoSessions([
+            row("2", new Date(base + SESSION_MAX_GAP_IN_MS + 1), {sessionId: "B"}),
+            row("1", new Date(base), {sessionId: "A"}),
+        ]);
+        expect(pastBoundary).toHaveLength(2);
     })
 
     it('falls back to time proximity for legacy logs without a sessionId', () => {
@@ -164,5 +223,19 @@ describe('countSessionsThisWeek', () => {
         ];
 
         expect(countSessionsThisWeek(workouts, now)).toEqual(1);
+    })
+
+    it('counts a spuriously-split session (two ids, minutes apart) once', () => {
+        // The real prod data: one Wed 2026-07-22 bench session broken into two ids at a 7.5-min gap.
+        // Week under test here: Monday 2026-07-20 → Sunday 2026-07-26.
+        const july22 = new Date("2026-07-24T12:00:00");
+        const workouts = [
+            row("QYFTun", new Date(1784743631556), {sessionId: "7ded470d"}),
+            row("rzLgSq", new Date(1784742954833), {sessionId: "7ded470d"}),
+            row("oCr4uV", new Date(1784742507438), {sessionId: "64649f8d"}),
+            row("KbvXzC", new Date(1784741776900), {sessionId: "64649f8d"}),
+        ];
+
+        expect(countSessionsThisWeek(workouts, july22)).toEqual(1);
     })
 })
