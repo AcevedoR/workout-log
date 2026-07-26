@@ -2,7 +2,7 @@
 
 import LogForm from "./form/log-form";
 import {Workout, WorkoutRow} from "./workout";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import WorkoutShortHistory from "./history/workout-short-history";
 
 import {add, deleteOne, findPersonalBest, getMostRecents} from "./firestore/WorkoutFirestore";
@@ -83,6 +83,17 @@ export default function Home(props: HomeProps) {
     const [bestWorkoutPerformance, setBestWorkoutPerformance] = useState<WorkoutRow | undefined>(undefined);
     const [usualLift, setUsualLift] = useState<UsualLift | undefined>(undefined);
 
+    // Distinct exercises the user has logged (within the fetched window), with counts, so the log
+    // form can suggest and rank the exercises they actually use alongside the shipped catalog.
+    const knownExercises = useMemo(() => {
+        const counts = new Map<string, number>();
+        for (const row of workoutRecentHistory) {
+            const name = row.value.exercise;
+            counts.set(name, (counts.get(name) ?? 0) + 1);
+        }
+        return Array.from(counts.entries()).map(([name, count]) => ({name, count}));
+    }, [workoutRecentHistory]);
+
     const findBestWorkoutPerformance = async (exercice: string) => {
         setBestWorkoutPerformance(await findPersonalBest(userID, exercice, db));
     }
@@ -137,6 +148,7 @@ export default function Home(props: HomeProps) {
                             <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
                                      lastWorkoutInput={getLastWorkoutInputInLocalStorage()}
                                      canShowExerciseHistory={!!currentSelectedExercise}
+                                     knownExercises={knownExercises}
                                      onShowExerciseHistory={() => setDisplayWorkoutHistoryPage(true)}>
                             </LogForm>
                         </div>

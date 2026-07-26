@@ -2,8 +2,9 @@ import React, {FocusEvent, useState} from "react";
 import {Workout} from "../workout";
 import {noop} from "../noop";
 import {sanitizeRpe} from "../model/rpe";
-import {normalizeExercise} from "../model/exercise";
+import {KnownExercise} from "../model/exercise-suggestions";
 import RpeSelector from "./rpe-selector";
+import ExerciseCombobox from "./exercise-combobox";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClockRotateLeft} from "@fortawesome/free-solid-svg-icons";
 
@@ -13,6 +14,7 @@ interface LogFormProps {
     lastWorkoutInput: Workout | undefined;
     onShowExerciseHistory?: () => void;
     canShowExerciseHistory?: boolean;
+    knownExercises?: KnownExercise[];
 }
 
 export default function LogForm(props: LogFormProps) {
@@ -22,6 +24,7 @@ export default function LogForm(props: LogFormProps) {
         lastWorkoutInput,
         onShowExerciseHistory = noop,
         canShowExerciseHistory = false,
+        knownExercises = [],
     } = props;
 
     const [exercise, setExercise] = useState(lastWorkoutInput ? lastWorkoutInput.exercise : "deadlift");
@@ -40,13 +43,11 @@ export default function LogForm(props: LogFormProps) {
         }
     }
 
-    // Once the user leaves the field, reflect the canonical name that will actually be logged, so
-    // "Benchpress" visibly becomes "benchpress" — the same exercise its history is stored under.
-    const onExerciseBlur = (e: FocusEvent<HTMLInputElement>) => {
-        const normalized = normalizeExercise(e.target.value);
-        if (normalized !== exercise) {
-            setExercise(normalized);
-        }
+    // Fired when the user picks a suggestion or leaves the field: the combobox hands back the
+    // canonical name it will be logged under, so refresh the stats/history for that exact exercise.
+    const onExerciseCommit = (exercise: string) => {
+        setExercise(exercise);
+        onExerciseSelected({exercise});
     }
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,29 +102,15 @@ export default function LogForm(props: LogFormProps) {
         >
             {error && <div style={{color: 'red'}}>{error}</div>}
 
-            <div className="form-element relative mt-2">
-                <input
-                    type="text"
-                    name="exercise"
-                    id="exercise"
-                    list="defaultExercices"
-                    placeholder=" "
-                    className={floatingInput}
+            <div className="form-element mt-2">
+                <ExerciseCombobox
                     value={exercise}
-                    onChange={(e) =>
-                        onExerciseChange(e.target.value)
-                    }
-                    onFocus={selectAllInputOnFocus}
-                    onBlur={onExerciseBlur}
-                    required
+                    onChange={onExerciseChange}
+                    onCommit={onExerciseCommit}
+                    knownExercises={knownExercises}
+                    inputClassName={floatingInput}
+                    labelClassName={floatingLabel}
                 />
-                <label className={floatingLabel} htmlFor="exercise">Exercise</label>
-                <datalist id="defaultExercices">
-                    <option value="deadlift"></option>
-                    <option value="squat"></option>
-                    <option value="bench press"></option>
-                    <option value="biceps curl"></option>
-                </datalist>
             </div>
             <div className="flex flex-row gap-3">
                 <div className="form-element relative flex-1">
