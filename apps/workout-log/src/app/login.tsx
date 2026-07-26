@@ -1,7 +1,7 @@
 import {AuthContextProvider, UserAuth} from "./auth/auth-context";
 import GoogleButton from "react-google-button";
 import InfoTooltip from "./utils/info-tooltip";
-import {appDevelopmentInformations, appShortDescription} from "./FeaturesConfiguration";
+import {appDevelopmentInformations} from "./FeaturesConfiguration";
 
 export default function Login() {
     const {user, googleSignIn, logOut} = UserAuth();
@@ -24,7 +24,6 @@ export default function Login() {
                     <InfoTooltip
                         textToShow={appDevelopmentInformations}></InfoTooltip>
                 </div>
-                <p className="mb-6 mt-2">{appShortDescription}</p>
                 <div className="m-6">
                     <GoogleButton
                         onClick={handleSignIn}

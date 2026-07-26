@@ -13,15 +13,22 @@ import {ClockWatch, ClockWatchRef} from "./clockwatch/clock-watch";
 import LogoutButton from "./auth/logout-button";
 import {UserID} from "./UserID";
 import {db} from "./firebase";
-import {appDevelopmentInformations, appShortDescription, isDevModeEnabled} from "./FeaturesConfiguration";
+import {appDevelopmentInformations, isDevModeEnabled} from "./FeaturesConfiguration";
 import UsualLiftWidget from "./workout-overview/usual-lift-widget";
 import {UsualLift} from "./model/usual-lift";
 import {findUsualLiftFromDb} from "./firestore/WorkoutStatisticsFirestore";
 import WorkoutHistoryPage from "./history/workout-history-page";
+import WeeklySessionCounter from "./workout-overview/weekly-session-counter";
 
 export interface HomeProps {
     userID: UserID
 }
+
+// How many recent workouts to fetch. Larger than what the short history shows, so the weekly
+// session counter has enough data to count every session since Monday.
+const WORKOUT_FETCH_LIMIT = 50;
+// How many recent workouts the "last workouts" list renders (the rest only feed the weekly counter).
+const SHORT_HISTORY_LIMIT = 10;
 
 export default function Home(props: HomeProps) {
     const {userID} = props;
@@ -67,7 +74,9 @@ export default function Home(props: HomeProps) {
 
     const getWorkoutRecentHistory = async () => {
         console.log("getWorkoutRecentHistory");
-        const mostRecentWorkouts = await getMostRecents(db, userID, 10);
+        // Fetch a wider window than we display so the weekly session counter can see every set logged
+        // this week (a busy week easily exceeds the handful of rows shown in the short history).
+        const mostRecentWorkouts = await getMostRecents(db, userID, WORKOUT_FETCH_LIMIT);
         setWorkoutRecentHistory(mostRecentWorkouts);
     }
 
@@ -81,7 +90,6 @@ export default function Home(props: HomeProps) {
         setUsualLift(await findUsualLiftFromDb(userID, exercice, db));
     }
 
-    const subtitle = <p className="text-xs">{appShortDescription}</p>
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-5 pt-4 sm:p-10 sm:pt-6">
             <div>
@@ -122,10 +130,9 @@ export default function Home(props: HomeProps) {
                                 : <></>
                             }
                         </div>
-                        {!bestWorkoutPerformance && !usualLift ? subtitle : <></>}
-
                         <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
-                                    ref={clockWatchChildRef}></ClockWatch>
+                                    ref={clockWatchChildRef}
+                                    trailing={<WeeklySessionCounter workoutList={workoutRecentHistory}></WeeklySessionCounter>}></ClockWatch>
                         <div>
                             <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
                                      lastWorkoutInput={getLastWorkoutInputInLocalStorage()}
@@ -133,7 +140,7 @@ export default function Home(props: HomeProps) {
                                      onShowExerciseHistory={() => setDisplayWorkoutHistoryPage(true)}>
                             </LogForm>
                         </div>
-                        <WorkoutShortHistory workoutList={workoutRecentHistory}
+                        <WorkoutShortHistory workoutList={workoutRecentHistory.slice(0, SHORT_HISTORY_LIMIT)}
                                              onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutShortHistory>
                     </>
                 }

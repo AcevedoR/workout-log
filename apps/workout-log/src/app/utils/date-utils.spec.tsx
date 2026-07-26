@@ -1,4 +1,4 @@
-import {formatNarrowSmartly, getDateDiffInSecondsAndMinutes} from "./date-utils";
+import {formatNarrowSmartly, getDateDiffInSecondsAndMinutes, startOfIsoWeek} from "./date-utils";
 import {describe, expect, it} from 'vitest'
 
 const US_LOCALE = new Intl.Locale('en-US');
@@ -55,6 +55,22 @@ describe('date utils tests', () => {
         expect(res).toEqual('03:00');
     })
 })
+describe('startOfIsoWeek', () => {
+    it('returns the Monday for a mid-week day', () => {
+        // 2024-07-10 is a Wednesday; its ISO week starts Monday 2024-07-08.
+        expect(startOfIsoWeek(new Date("2024-07-10T18:30:00"))).toEqual(new Date("2024-07-08T00:00:00"));
+    })
+
+    it('returns the same day at midnight when already a Monday', () => {
+        expect(startOfIsoWeek(new Date("2024-07-08T09:15:00"))).toEqual(new Date("2024-07-08T00:00:00"));
+    })
+
+    it('returns the preceding Monday for a Sunday (not the next one)', () => {
+        // 2024-07-14 is a Sunday; it belongs to the week starting Monday 2024-07-08.
+        expect(startOfIsoWeek(new Date("2024-07-14T23:59:00"))).toEqual(new Date("2024-07-08T00:00:00"));
+    })
+})
+
 describe('date diff tests', () => {
     it('returns seconds only', () => {
         const res = getDateDiffInSecondsAndMinutes(new Date("2024-07-12T08:08:00"), new Date("2024-07-12T08:08:30"));

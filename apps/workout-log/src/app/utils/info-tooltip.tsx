@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Bounce, toast} from "react-toastify";
 
 interface InfoTooltipProps {
-    textToShow: string;
+    textToShow: React.ReactNode;
 }
 
 export default function InfoTooltip(props: InfoTooltipProps) {
