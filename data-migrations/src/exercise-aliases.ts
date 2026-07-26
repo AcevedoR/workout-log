@@ -8,10 +8,14 @@ import {normalizeExercise} from "../../apps/workout-log/src/app/model/exercise";
  *
  *   "Bench press"        -> these were actually dumbbell bench press
  *   "Barred bench press" -> "barred" is a typo of "barbell"; the barbell bench press
+ *   "Squat paused"       -> same lift as "Paused squat", just reversed word order
+ *   "Legpress"           -> missing space; same as "Leg press"
  */
 export const EXERCISE_RENAMES: Record<string, string> = {
     "bench press": "dumbbell bench press",
     "barred bench press": "barbell bench press",
+    "squat paused": "paused squat",
+    "legpress": "leg press",
 };
 
 /**
