@@ -90,7 +90,6 @@ export default function Home(props: HomeProps) {
         setUsualLift(await findUsualLiftFromDb(userID, exercice, db));
     }
 
-    const subtitle = <p className="text-xs">{appShortDescription}</p>
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-5 pt-4 sm:p-10 sm:pt-6">
             <div>
@@ -101,15 +100,11 @@ export default function Home(props: HomeProps) {
                         Workout log{isDevModeEnabled ? " dev mode" : ""}
                     </h1>
                     <InfoTooltip
-                        textToShow={appDevelopmentInformations}></InfoTooltip>
+                        textToShow={<><p>{appShortDescription}</p><p className="mt-2">{appDevelopmentInformations}</p></>}></InfoTooltip>
                     <div
                         className="w-12 h-8 ml-6 rounded-md bg-rose-800	 hover:bg-red-700 text-white flex items-center justify-center text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                         <LogoutButton></LogoutButton>
                     </div>
-                </div>
-
-                <div className="flex justify-center mt-2">
-                    <WeeklySessionCounter workoutList={workoutRecentHistory}></WeeklySessionCounter>
                 </div>
 
                 {displayWorkoutHistoryPage && currentSelectedExercise ?
@@ -135,10 +130,9 @@ export default function Home(props: HomeProps) {
                                 : <></>
                             }
                         </div>
-                        {!bestWorkoutPerformance && !usualLift ? subtitle : <></>}
-
                         <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
-                                    ref={clockWatchChildRef}></ClockWatch>
+                                    ref={clockWatchChildRef}
+                                    trailing={<WeeklySessionCounter workoutList={workoutRecentHistory}></WeeklySessionCounter>}></ClockWatch>
                         <div>
                             <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}
                                      lastWorkoutInput={getLastWorkoutInputInLocalStorage()}

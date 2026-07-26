@@ -8,6 +8,9 @@ export interface ClockWatchRef {
 
 export interface ClockWatchProps {
     getLastWorkoutDate: () => number | undefined
+    // Rendered to the right of the timer (e.g. the weekly session counter). Shown even when the
+    // timer itself is hidden, so it simply sits centered on its own in that case.
+    trailing?: React.ReactNode
 }
 
 function getReferenceDate(lastWorkoutDate: number | undefined) {
@@ -27,7 +30,7 @@ export function displayClockWatch(startDate: Date): {seconds: number, minutes: n
 }
 
 export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatchRef>) => {
-    const {getLastWorkoutDate} = props;
+    const {getLastWorkoutDate, trailing} = props;
 
     const [timeToDisplay, setTimeToDisplay] = useState<string | null>(null);
     const [date, setDate] = useState<Date>(new Date(getReferenceDate(getLastWorkoutDate())));
@@ -66,10 +69,11 @@ export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatc
     }, [date])
 
     return (
-        <div className="flex flex-row justify-center items-center pt-2 text-xl">
+        <div className="flex flex-row justify-center items-center gap-3 pt-2 text-xl">
             {timeToDisplay ?
                 <div data-testid="custom-element" role={"meter"}>{timeToDisplay}</div> : <></>
             }
+            {trailing}
         </div>
     );
 });
