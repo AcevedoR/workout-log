@@ -81,20 +81,24 @@ export default function LogForm(props: LogFormProps) {
 
     let lastFocusEvent: FocusEvent<HTMLInputElement> | undefined = undefined;
 
+    const floatingInput = "peer w-full rounded-md border-gray-300 px-3 pt-5 pb-1 text-base focus:border-main focus:ring-main";
+    const floatingLabel = "pointer-events-none absolute left-3 top-1 text-xs font-medium text-gray-500 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-1 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-main";
+
     return (
         <form
-            className='log-form flex flex-col items-center border-b border-gray-900/10 pb-4 gap-x-6 gap-y-3 sm:grid-cols-6'
+            className='log-form flex flex-col items-stretch w-full max-w-sm mx-auto border-b border-gray-900/10 pb-4 gap-y-3'
             onSubmit={(e) => onSubmit(e)}
         >
             {error && <div style={{color: 'red'}}>{error}</div>}
 
-            <div className="form-element col-span-full mt-2">
-                <label className="block text-sm font-medium leading-6" htmlFor="exercise">Exercise</label>
+            <div className="form-element relative mt-2">
                 <input
                     type="text"
                     name="exercise"
                     id="exercise"
                     list="defaultExercices"
+                    placeholder=" "
+                    className={floatingInput}
                     value={exercise}
                     onChange={(e) =>
                         onExerciseChange(e.target.value)
@@ -102,6 +106,7 @@ export default function LogForm(props: LogFormProps) {
                     onFocus={selectAllInputOnFocus}
                     required
                 />
+                <label className={floatingLabel} htmlFor="exercise">Exercise</label>
                 <datalist id="defaultExercices">
                     <option value="deadlift"></option>
                     <option value="squat"></option>
@@ -109,34 +114,40 @@ export default function LogForm(props: LogFormProps) {
                     <option value="biceps curl"></option>
                 </datalist>
             </div>
-            <div className={"form-element"}>
-                <label className="block text-sm font-medium leading-6" htmlFor="reps">Reps</label>
-                <input
-                    type="number"
-                    name="reps"
-                    id="reps"
-                    value={reps}
-                    onChange={(e) =>
-                        setReps(Number.parseInt(e.target.value))
-                    }
-                    onFocus={selectAllInputOnFocus}
-                    required
-                />
-            </div>
-            <div className={"form-element"}>
-                <label htmlFor="weight" className="block text-sm font-medium leading-6">Weight</label>
-                <input
-                    type="number"
-                    name="weight"
-                    id="weight"
-                    value={weight}
-                    step="0.25"
-                    onChange={(e) =>
-                        setWeight(Number.parseFloat(e.target.value))
-                    }
-                    onFocus={selectAllInputOnFocus}
-                    required
-                />
+            <div className="flex flex-row gap-3">
+                <div className="form-element relative flex-1">
+                    <input
+                        type="number"
+                        name="reps"
+                        id="reps"
+                        placeholder=" "
+                        className={floatingInput}
+                        value={reps}
+                        onChange={(e) =>
+                            setReps(Number.parseInt(e.target.value))
+                        }
+                        onFocus={selectAllInputOnFocus}
+                        required
+                    />
+                    <label className={floatingLabel} htmlFor="reps">Reps</label>
+                </div>
+                <div className="form-element relative flex-1">
+                    <input
+                        type="number"
+                        name="weight"
+                        id="weight"
+                        placeholder=" "
+                        className={floatingInput}
+                        value={weight}
+                        step="0.25"
+                        onChange={(e) =>
+                            setWeight(Number.parseFloat(e.target.value))
+                        }
+                        onFocus={selectAllInputOnFocus}
+                        required
+                    />
+                    <label htmlFor="weight" className={floatingLabel}>Weight</label>
+                </div>
             </div>
             <div className="form-element w-full">
                 <label htmlFor="rpe-selector" className="block text-sm font-medium leading-6">
@@ -144,7 +155,7 @@ export default function LogForm(props: LogFormProps) {
                 </label>
                 <RpeSelector value={rpe} onChange={setRpe}/>
             </div>
-            <div className="form-element content-center flex flex-row items-center gap-3">
+            <div className="form-element content-center flex flex-row items-center justify-center gap-3">
                 <button
                     className="rounded-md bg-main px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-main/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     type="submit"

@@ -18,10 +18,17 @@ import UsualLiftWidget from "./workout-overview/usual-lift-widget";
 import {UsualLift} from "./model/usual-lift";
 import {findUsualLiftFromDb} from "./firestore/WorkoutStatisticsFirestore";
 import WorkoutHistoryPage from "./history/workout-history-page";
+import WeeklySessionCounter from "./workout-overview/weekly-session-counter";
 
 export interface HomeProps {
     userID: UserID
 }
+
+// How many recent workouts to fetch. Larger than what the short history shows, so the weekly
+// session counter has enough data to count every session since Monday.
+const WORKOUT_FETCH_LIMIT = 50;
+// How many recent workouts the "last workouts" list renders (the rest only feed the weekly counter).
+const SHORT_HISTORY_LIMIT = 10;
 
 export default function Home(props: HomeProps) {
     const {userID} = props;
@@ -67,7 +74,9 @@ export default function Home(props: HomeProps) {
 
     const getWorkoutRecentHistory = async () => {
         console.log("getWorkoutRecentHistory");
-        const mostRecentWorkouts = await getMostRecents(db, userID, 10);
+        // Fetch a wider window than we display so the weekly session counter can see every set logged
+        // this week (a busy week easily exceeds the handful of rows shown in the short history).
+        const mostRecentWorkouts = await getMostRecents(db, userID, WORKOUT_FETCH_LIMIT);
         setWorkoutRecentHistory(mostRecentWorkouts);
     }
 
@@ -97,6 +106,10 @@ export default function Home(props: HomeProps) {
                         className="w-12 h-8 ml-6 rounded-md bg-rose-800	 hover:bg-red-700 text-white flex items-center justify-center text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                         <LogoutButton></LogoutButton>
                     </div>
+                </div>
+
+                <div className="flex justify-center mt-2">
+                    <WeeklySessionCounter workoutList={workoutRecentHistory}></WeeklySessionCounter>
                 </div>
 
                 {displayWorkoutHistoryPage && currentSelectedExercise ?
@@ -133,7 +146,7 @@ export default function Home(props: HomeProps) {
                                      onShowExerciseHistory={() => setDisplayWorkoutHistoryPage(true)}>
                             </LogForm>
                         </div>
-                        <WorkoutShortHistory workoutList={workoutRecentHistory}
+                        <WorkoutShortHistory workoutList={workoutRecentHistory.slice(0, SHORT_HISTORY_LIMIT)}
                                              onWorkoutDelete={workoutId => onWorkoutDelete(workoutId)}></WorkoutShortHistory>
                     </>
                 }

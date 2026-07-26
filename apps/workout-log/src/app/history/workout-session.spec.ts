@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import {WorkoutRow} from "../workout";
-import {groupWorkoutsIntoSessions, resolveSessionId, SESSION_MAX_GAP_IN_MS} from "./workout-session";
+import {countSessionsThisWeek, groupWorkoutsIntoSessions, resolveSessionId, SESSION_MAX_GAP_IN_MS} from "./workout-session";
 
 function row(id: string, date: Date, overrides?: { exercise?: string, reps?: number, weight?: number, sessionId?: string }): WorkoutRow {
     return {
@@ -126,5 +126,43 @@ describe('groupWorkoutsIntoSessions', () => {
         expect(sessions).toHaveLength(2);
         expect(sessions[0].workouts).toEqual([workouts[0], workouts[1]]);
         expect(sessions[1].workouts).toEqual([workouts[2], workouts[3]]);
+    })
+})
+
+describe('countSessionsThisWeek', () => {
+    // Week under test: Monday 2024-07-08 → Sunday 2024-07-14. "now" is that Wednesday.
+    const now = new Date("2024-07-10T12:00:00");
+
+    it('counts no session for an empty list', () => {
+        expect(countSessionsThisWeek([], now)).toEqual(0);
+    })
+
+    it('counts each distinct session started within the week', () => {
+        const workouts = [
+            row("4", new Date("2024-07-10T18:20:00"), {sessionId: "wed"}),
+            row("3", new Date("2024-07-10T18:00:00"), {sessionId: "wed"}),
+            row("2", new Date("2024-07-08T09:20:00"), {sessionId: "mon"}),
+            row("1", new Date("2024-07-08T09:00:00"), {sessionId: "mon"}),
+        ];
+
+        expect(countSessionsThisWeek(workouts, now)).toEqual(2);
+    })
+
+    it('excludes sessions from the previous week', () => {
+        const workouts = [
+            row("2", new Date("2024-07-08T09:00:00"), {sessionId: "thisWeek"}),
+            row("1", new Date("2024-07-07T09:00:00"), {sessionId: "lastWeekSunday"}),
+        ];
+
+        expect(countSessionsThisWeek(workouts, now)).toEqual(1);
+    })
+
+    it('includes a session starting exactly at Monday 00:00 and excludes the following Monday', () => {
+        const workouts = [
+            row("2", new Date("2024-07-15T00:00:00"), {sessionId: "nextWeek"}),
+            row("1", new Date("2024-07-08T00:00:00"), {sessionId: "monMidnight"}),
+        ];
+
+        expect(countSessionsThisWeek(workouts, now)).toEqual(1);
     })
 })

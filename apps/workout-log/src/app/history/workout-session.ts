@@ -1,4 +1,5 @@
 import {WorkoutRow} from "../workout";
+import {startOfIsoWeek} from "../utils/date-utils";
 
 // Two workouts logged within this window belong to the same gym session.
 // Longer than a rest between sets/exercises, shorter than the gap between two visits to the gym.
@@ -64,6 +65,22 @@ export function groupWorkoutsIntoSessions(workouts: WorkoutRow[], maxGapInMs: nu
     sessions.push(toSession(current));
 
     return sessions;
+}
+
+/**
+ * Counts how many distinct gym sessions fall within the current week (Monday→Sunday, local time).
+ * A session is attributed to the week of its first set (`startDate`). `now` is injectable for testing.
+ *
+ * `workouts` must be sorted most-recent-first, as returned by `getMostRecents`. Note the count is only
+ * accurate if the fetched window reaches back far enough to include every set logged this week.
+ */
+export function countSessionsThisWeek(workouts: WorkoutRow[], now: Date = new Date(), maxGapInMs: number = SESSION_MAX_GAP_IN_MS): number {
+    const weekStart = startOfIsoWeek(now).valueOf();
+    const weekEnd = weekStart + 7 * 24 * 60 * 60 * 1000;
+
+    return groupWorkoutsIntoSessions(workouts, maxGapInMs)
+        .filter(session => session.startDate >= weekStart && session.startDate < weekEnd)
+        .length;
 }
 
 function belongToSameSession(a: WorkoutRow, b: WorkoutRow, maxGapInMs: number): boolean {
