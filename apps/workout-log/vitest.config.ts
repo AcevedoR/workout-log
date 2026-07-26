@@ -2,6 +2,13 @@ import {configDefaults, defineConfig} from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
+// Force a non-production React build for tests. CI runs `nx test` after `next build` under
+// NODE_ENV=production (Vercel sets it for the whole build); React then loads its production bundle,
+// where @testing-library's act()-based render/cleanup throws "act(...) is not supported in
+// production builds of React". Setting this here (before the fork workers spawn) makes them inherit
+// NODE_ENV=test regardless of the ambient value.
+process.env.NODE_ENV = 'test'
+
 export default defineConfig({
     plugins: [react()],
     test: {
