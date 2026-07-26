@@ -1,0 +1,9 @@
+{
+  "name": "@workout-log/data-migrations",
+  "version": "0.1.0",
+  "private": true,
+  "description": "One-off, kept-for-reference data migration scripts for the workout-log Firestore database. Every script defaults to a read-only dry run and only writes when passed --commit.",
+  "scripts": {
+    "migrate:exercise-names": "ts-node --project tsconfig.json src/normalize-exercise-names.ts"
+  }
+}
