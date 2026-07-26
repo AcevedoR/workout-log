@@ -2,6 +2,7 @@ import React, {FocusEvent, useState} from "react";
 import {Workout} from "../workout";
 import {noop} from "../noop";
 import {sanitizeRpe} from "../model/rpe";
+import {normalizeExercise} from "../model/exercise";
 import RpeSelector from "./rpe-selector";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClockRotateLeft} from "@fortawesome/free-solid-svg-icons";
@@ -36,6 +37,15 @@ export default function LogForm(props: LogFormProps) {
         setExercise(exercise);
         if(exercise.length > 2){
             onExerciseSelected({exercise});
+        }
+    }
+
+    // Once the user leaves the field, reflect the canonical name that will actually be logged, so
+    // "Benchpress" visibly becomes "benchpress" — the same exercise its history is stored under.
+    const onExerciseBlur = (e: FocusEvent<HTMLInputElement>) => {
+        const normalized = normalizeExercise(e.target.value);
+        if (normalized !== exercise) {
+            setExercise(normalized);
         }
     }
 
@@ -104,6 +114,7 @@ export default function LogForm(props: LogFormProps) {
                         onExerciseChange(e.target.value)
                     }
                     onFocus={selectAllInputOnFocus}
+                    onBlur={onExerciseBlur}
                     required
                 />
                 <label className={floatingLabel} htmlFor="exercise">Exercise</label>
