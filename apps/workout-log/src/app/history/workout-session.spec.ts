@@ -137,6 +137,41 @@ describe('groupWorkoutsIntoSessions', () => {
         expect(sessions[0].workouts).toHaveLength(7);
     })
 
+    it('heals a session fragmented into three different ids when every gap stays within the window', () => {
+        // A read can fail more than once in a session, minting a fresh id each time. As long as each
+        // consecutive gap is within the window the whole thing must still collapse to one session.
+        const workouts = [
+            row("5", new Date("2024-07-13T10:40:00"), {sessionId: "C"}),
+            row("4", new Date("2024-07-13T10:30:00"), {sessionId: "C"}),
+            row("3", new Date("2024-07-13T10:20:00"), {sessionId: "B"}),
+            row("2", new Date("2024-07-13T10:10:00"), {sessionId: "B"}),
+            row("1", new Date("2024-07-13T10:00:00"), {sessionId: "A"}),
+        ];
+
+        const sessions = groupWorkoutsIntoSessions(workouts);
+
+        expect(sessions).toHaveLength(1);
+        expect(sessions[0].workouts).toHaveLength(5);
+    })
+
+    it('merges different ids exactly at the gap boundary but splits one millisecond past it', () => {
+        // Guards the healing rule from over-reaching: two genuinely separate visits are always more
+        // than the gap apart, so the boundary is exactly where a spurious split stops being plausible.
+        const base = new Date("2024-07-13T10:00:00").valueOf();
+
+        const atBoundary = groupWorkoutsIntoSessions([
+            row("2", new Date(base + SESSION_MAX_GAP_IN_MS), {sessionId: "B"}),
+            row("1", new Date(base), {sessionId: "A"}),
+        ]);
+        expect(atBoundary).toHaveLength(1);
+
+        const pastBoundary = groupWorkoutsIntoSessions([
+            row("2", new Date(base + SESSION_MAX_GAP_IN_MS + 1), {sessionId: "B"}),
+            row("1", new Date(base), {sessionId: "A"}),
+        ]);
+        expect(pastBoundary).toHaveLength(2);
+    })
+
     it('falls back to time proximity for legacy logs without a sessionId', () => {
         const workouts = [
             row("4", new Date("2024-07-13T18:20:00")),
