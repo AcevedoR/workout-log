@@ -13,6 +13,7 @@ import {
 } from "@firebase/firestore";
 import {Workout, WorkoutRow} from "../workout";
 import {generateSessionId, resolveSessionId} from "../history/workout-session";
+import {normalizeExercise} from "../model/exercise";
 
 const WORKOUT_LOG_COLLECTION = "workout-log";
 
@@ -25,7 +26,8 @@ export async function add(userId: string, workout: Workout, db: Firestore) {
             weight: workout.weight,
             date: workout.date,
             reps: workout.reps,
-            exercise: workout.exercise,
+            // Canonicalize so "Benchpress" and "benchpress" resolve to the same exercise.
+            exercise: normalizeExercise(workout.exercise),
             sessionId: sessionId,
             userId: userId
         };
@@ -61,7 +63,7 @@ export async function getMostRecents(db: Firestore, userId: string, lasts: numbe
             where("userId", "==", userId)
         ];
         if (options?.exercise) {
-            queryConstraints.push(where("exercise", "==", options.exercise));
+            queryConstraints.push(where("exercise", "==", normalizeExercise(options.exercise)));
         }
         queryConstraints.push(orderBy("date", "desc"));
         queryConstraints.push(limit(lasts));
@@ -94,7 +96,7 @@ export async function findPersonalBest(userId: string, exercise: string, db: Fir
         const querySnapshot = await getDocs(
             query(workoutLogCollection,
                 where("userId", "==", userId),
-                where("exercise", "==", exercise),
+                where("exercise", "==", normalizeExercise(exercise)),
                 orderBy("weight", "desc"),
                 orderBy("reps", "desc"),
                 limit(1)
