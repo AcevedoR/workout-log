@@ -1,6 +1,7 @@
 'use client'
 import React, {forwardRef, Ref, useEffect, useImperativeHandle, useState} from "react";
 import {getDateDiffInSecondsAndMinutes} from "../utils/date-utils";
+import SessionDuration from "./session-duration";
 
 export interface ClockWatchRef {
     resetClockWatch: () => void
@@ -8,6 +9,9 @@ export interface ClockWatchRef {
 
 export interface ClockWatchProps {
     getLastWorkoutDate: () => number | undefined
+    // First set of the session the user is currently in, when they are in one. Its duration is shown
+    // next to the timer, quieter than the timer itself.
+    sessionStartDate?: number
     // Rendered to the right of the timer (e.g. the weekly session counter). Shown even when the
     // timer itself is hidden, so it simply sits centered on its own in that case.
     trailing?: React.ReactNode
@@ -30,7 +34,7 @@ export function displayClockWatch(startDate: Date): {seconds: number, minutes: n
 }
 
 export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatchRef>) => {
-    const {getLastWorkoutDate, trailing} = props;
+    const {getLastWorkoutDate, sessionStartDate, trailing} = props;
 
     const [timeToDisplay, setTimeToDisplay] = useState<string | null>(null);
     const [date, setDate] = useState<Date>(new Date(getReferenceDate(getLastWorkoutDate())));
@@ -73,6 +77,7 @@ export const ClockWatch = forwardRef((props: ClockWatchProps, ref: Ref<ClockWatc
             {timeToDisplay ?
                 <div data-testid="custom-element" role={"meter"}>{timeToDisplay}</div> : <></>
             }
+            {sessionStartDate ? <SessionDuration sessionStartDate={sessionStartDate}></SessionDuration> : <></>}
             {trailing}
         </div>
     );

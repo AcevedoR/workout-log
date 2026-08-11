@@ -19,6 +19,7 @@ import {UsualLift} from "./model/usual-lift";
 import {findUsualLiftFromDb} from "./firestore/WorkoutStatisticsFirestore";
 import WorkoutHistoryPage from "./history/workout-history-page";
 import WeeklySessionCounter from "./workout-overview/weekly-session-counter";
+import {findOngoingSession} from "./history/workout-session";
 
 export interface HomeProps {
     userID: UserID
@@ -94,6 +95,10 @@ export default function Home(props: HomeProps) {
         return Array.from(counts.entries()).map(([name, count]) => ({name, count}));
     }, [workoutRecentHistory]);
 
+    // The session the user is training in right now, if any — recomputed whenever a new set lands, so the
+    // displayed session duration starts from the first set of the current gym visit.
+    const ongoingSession = useMemo(() => findOngoingSession(workoutRecentHistory), [workoutRecentHistory]);
+
     const findBestWorkoutPerformance = async (exercice: string) => {
         setBestWorkoutPerformance(await findPersonalBest(userID, exercice, db));
     }
@@ -143,6 +148,7 @@ export default function Home(props: HomeProps) {
                         </div>
                         <ClockWatch getLastWorkoutDate={() => getLastWorkoutInputInLocalStorage()?.date}
                                     ref={clockWatchChildRef}
+                                    sessionStartDate={ongoingSession?.startDate}
                                     trailing={<WeeklySessionCounter workoutList={workoutRecentHistory}></WeeklySessionCounter>}></ClockWatch>
                         <div>
                             <LogForm onWorkoutLog={onWorkoutLog} onExerciseSelected={onExerciseSelected}

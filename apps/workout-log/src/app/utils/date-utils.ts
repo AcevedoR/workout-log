@@ -42,6 +42,22 @@ export function startOfIsoWeek(date: Date): Date {
     return result;
 }
 
+/**
+ * Compact elapsed-duration label for the ongoing session, e.g. `0m`, `47m`, `1h07`.
+ * Deliberately terser than the rest timer (which counts seconds) — session length only matters
+ * to the minute, and it sits next to the timer where space is tight.
+ */
+export function formatDurationShort(durationInMs: number): string {
+    const totalMinutes = Math.max(0, Math.floor(durationInMs / (1000 * 60)));
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) {
+        return `${minutes}m`;
+    }
+    return `${hours}h${String(minutes).padStart(2, '0')}`;
+}
+
 export function getDateDiffInSecondsAndMinutes(d1: Date, d2: Date): { seconds: number, minutes: number } {
     let timer = new Date(Math.abs(d1.getTime() - d2.getTime()));
 

@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest'
 import {WorkoutRow} from "../workout";
-import {countSessionsThisWeek, groupWorkoutsIntoSessions, resolveSessionId, SESSION_MAX_GAP_IN_MS} from "./workout-session";
+import {countSessionsThisWeek, findOngoingSession, groupWorkoutsIntoSessions, resolveSessionId, SESSION_MAX_GAP_IN_MS} from "./workout-session";
 
 function row(id: string, date: Date, overrides?: { exercise?: string, reps?: number, weight?: number, sessionId?: string }): WorkoutRow {
     return {
@@ -237,5 +237,58 @@ describe('countSessionsThisWeek', () => {
         ];
 
         expect(countSessionsThisWeek(workouts, july22)).toEqual(1);
+    })
+})
+
+describe('findOngoingSession', () => {
+    it('finds no session when nothing has been logged', () => {
+        expect(findOngoingSession([], new Date("2024-07-13T10:00:00"))).toBeUndefined();
+    })
+
+    it('finds the current session and its first set when the last set is recent', () => {
+        const now = new Date("2024-07-13T11:00:00");
+        const workouts = [
+            row("3", new Date("2024-07-13T10:40:00"), {sessionId: "session-A"}),
+            row("2", new Date("2024-07-13T10:20:00"), {sessionId: "session-A"}),
+            row("1", new Date("2024-07-13T10:00:00"), {sessionId: "session-A"}),
+        ];
+
+        const session = findOngoingSession(workouts, now);
+
+        expect(session?.sessionId).toEqual("session-A");
+        expect(session?.startDate).toEqual(new Date("2024-07-13T10:00:00").valueOf());
+    })
+
+    it('finds no session when the last set is older than the session gap', () => {
+        const now = new Date("2024-07-13T16:00:00");
+        const workouts = [
+            row("1", new Date("2024-07-13T10:00:00"), {sessionId: "session-A"}),
+        ];
+
+        expect(findOngoingSession(workouts, now)).toBeUndefined();
+    })
+
+    it('ignores older sessions and only considers the most recent one', () => {
+        const now = new Date("2024-07-13T10:30:00");
+        const workouts = [
+            row("2", new Date("2024-07-13T10:20:00"), {sessionId: "session-B"}),
+            row("1", new Date("2024-07-12T18:00:00"), {sessionId: "session-A"}),
+        ];
+
+        const session = findOngoingSession(workouts, now);
+
+        expect(session?.sessionId).toEqual("session-B");
+        expect(session?.workouts).toHaveLength(1);
+    })
+
+    it('spans a spuriously-split session so the duration covers the whole gym visit', () => {
+        const now = new Date(1784743700000);
+        const workouts = [
+            row("QYFTun", new Date(1784743631556), {sessionId: "7ded470d"}),
+            row("oCr4uV", new Date(1784742507438), {sessionId: "64649f8d"}),
+            row("KbvXzC", new Date(1784741776900), {sessionId: "64649f8d"}),
+        ];
+
+        expect(findOngoingSession(workouts, now)?.startDate).toEqual(1784741776900);
     })
 })
