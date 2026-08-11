@@ -89,6 +89,25 @@ export function countSessionsThisWeek(workouts: WorkoutRow[], now: Date = new Da
         .length;
 }
 
+/**
+ * Returns the session the user is currently in, or `undefined` when they are not training right now.
+ * A session is "ongoing" when its last set was logged no longer than `maxGapInMs` ago — the same window
+ * that decides whether a new log extends a session, so this stays consistent with `resolveSessionId`.
+ *
+ * `workouts` must be sorted most-recent-first, as returned by `getMostRecents`. `now` is injectable for testing.
+ */
+export function findOngoingSession(workouts: WorkoutRow[], now: Date = new Date(), maxGapInMs: number = SESSION_MAX_GAP_IN_MS): WorkoutSession | undefined {
+    if (workouts.length === 0) {
+        return undefined;
+    }
+
+    const mostRecentSession = groupWorkoutsIntoSessions(workouts, maxGapInMs)[0];
+    if (now.valueOf() - mostRecentSession.endDate > maxGapInMs) {
+        return undefined;
+    }
+    return mostRecentSession;
+}
+
 function belongToSameSession(a: WorkoutRow, b: WorkoutRow, maxGapInMs: number): boolean {
     if (a.value.sessionId && b.value.sessionId && a.value.sessionId === b.value.sessionId) {
         return true;

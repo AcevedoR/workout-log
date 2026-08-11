@@ -1,4 +1,4 @@
-import {formatFullDateTime, formatNarrowSmartly, getDateDiffInSecondsAndMinutes, startOfIsoWeek} from "./date-utils";
+import {formatDurationShort, formatFullDateTime, formatNarrowSmartly, getDateDiffInSecondsAndMinutes, startOfIsoWeek} from "./date-utils";
 import {describe, expect, it} from 'vitest'
 
 const US_LOCALE = new Intl.Locale('en-US');
@@ -115,5 +115,27 @@ describe('date diff tests', () => {
         const res = getDateDiffInSecondsAndMinutes(new Date("2024-07-12T08:08:00"), new Date("2024-07-12T09:08:30"));
 
         expect(res).toEqual({minutes: 60, seconds: 30});
+    })
+})
+
+describe('formatDurationShort', () => {
+    it('shows minutes only under an hour', () => {
+        expect(formatDurationShort(47 * 60 * 1000)).toEqual("47m");
+    })
+
+    it('shows 0m for a session that just started', () => {
+        expect(formatDurationShort(12 * 1000)).toEqual("0m");
+    })
+
+    it('pads the minutes once past an hour', () => {
+        expect(formatDurationShort((60 + 7) * 60 * 1000)).toEqual("1h07");
+    })
+
+    it('shows a whole number of hours', () => {
+        expect(formatDurationShort(2 * 60 * 60 * 1000)).toEqual("2h00");
+    })
+
+    it('never shows a negative duration', () => {
+        expect(formatDurationShort(-5000)).toEqual("0m");
     })
 })
