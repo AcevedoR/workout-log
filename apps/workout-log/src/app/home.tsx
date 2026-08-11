@@ -29,7 +29,7 @@ export interface HomeProps {
 // session counter has enough data to count every session since Monday.
 const WORKOUT_FETCH_LIMIT = 50;
 // How many recent workouts the "last workouts" list renders (the rest only feed the weekly counter).
-const SHORT_HISTORY_LIMIT = 10;
+const SHORT_HISTORY_LIMIT = 20;
 
 export default function Home(props: HomeProps) {
     const {userID} = props;
